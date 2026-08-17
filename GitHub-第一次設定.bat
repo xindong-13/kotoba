@@ -148,6 +148,7 @@ start "" https://%GHUSER%.github.io/%REPO%/
 exit /b
 
 :GITIGNORE
+if not exist ".nojekyll" copy nul ".nojekyll" >nul
 > .gitignore echo # Build / tooling folders - never upload these
 >> .gitignore echo .deploy/
 >> .gitignore echo .netlify/
