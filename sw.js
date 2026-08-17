@@ -1,7 +1,7 @@
 /* コトバ Kotoba — Service Worker（離線快取 ＋ 自動更新）
    改過任何檔案後版本號要往上加一號，手機才會知道有新版。
    用「手機版-一鍵更新.bat」的話會自動加，不用手動改。 */
-const CACHE = 'kotoba-v7';
+const CACHE = 'kotoba-v9';
 const ASSETS = [
   './',
   './index.html',

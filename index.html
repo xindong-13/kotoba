@@ -481,7 +481,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
 /* ======================================================================
    コトバ Kotoba — 核心：題庫解析／儲存／間隔複習／同步／AI
    ====================================================================== */
-const APPVER='kotoba-v7';
+const APPVER='kotoba-v8';
 const KEY='kotoba_data_v1';
 const IDB_DB='kotoba', IDB_ST='kv';
 
@@ -501,9 +501,9 @@ const GRAM = lines(window.GRAMMAR_RAW).map((l,i)=>{
   const[p,m,c,e,ek,et,lv]=l.split('|'); return {id:'g'+i,p,m,c,e,ek,et,lv:+lv};
 });
 const SENT = lines(window.SENT_RAW).map((l,i)=>{
-  const[j,k,c,tag,lv]=l.split('|');
+  const[j,k,c,tag,lv,step]=l.split('|');
   const ch=j.split('/').map(x=>x.trim()).filter(Boolean);
-  return {id:'s'+i,j:ch.join(''),ch,k,c,tag,lv:+lv};
+  return {id:'s'+i,j:ch.join(''),ch,k,c,tag,lv:+lv,step:+(step||1)};
 });
 const PARTICLES=['は','が','を','に','で','へ','と','も','から','まで','より','の'];
 
@@ -918,7 +918,8 @@ const KANA = lines(window.KANA_RAW).map((l,i)=>{
 function allVocab(){return VOCAB.concat((S.custom.vocab||[]).map((x,i)=>({id:'cv'+i,w:x.w,r:x.r,m:x.m,p:x.p||'名',lv:x.lv||5})))}
 function allSent(){return SENT.concat((S.custom.sent||[]).map((x,i)=>{
   const ch=(x.j||'').split('/').map(s=>s.trim()).filter(Boolean);
-  return {id:'cs'+i,j:ch.join(''),ch,k:x.k||'',c:x.c||'',tag:'自訂',lv:x.lv||5};
+  // 自訂句（AI 批改存進來的）用你當時的進度當 step，所以馬上就會被考到
+  return {id:'cs'+i,j:ch.join(''),ch,k:x.k||'',c:x.c||'',tag:'自訂',lv:x.lv||5,step:x.step||1};
 }))}
 function poolRaw(mode){
   if(mode==='vocab')return allVocab();
@@ -948,7 +949,7 @@ function poolFor(mode){
       return p.filter(x=>ids.has(x.id));
     }
     const tg=new Set(weekTags(WEEKF.w));
-    return p.filter(x=>x.lv===5||tg.has(x.tag));
+    return p.filter(x=>x.lv===5||tg.has(x.tag));   // N4 階段：全部 N5 ＋ 當週情境
   }
   if(!DAYF)return p;
   if(mode==='vocab'||mode==='kanji'){
@@ -959,8 +960,8 @@ function poolFor(mode){
     const ids=new Set(n5k().slice(0,DAYF.kEnd).map(v=>v.id));
     return p.filter(x=>ids.has(x.id));
   }
-  const tg=new Set(dayTags(DAYF.d));
-  return p.filter(x=>x.lv===5&&tg.has(x.tag));
+  // 用文法難度（step）篩，不是用情境。step 就是「這句最早能在第幾天出現」
+  return p.filter(x=>x.lv===5&&(x.step||1)<=DAYF.d);
 }
 function pick(mode,n){
   const pool=poolFor(mode); if(!pool.length)return [];
@@ -1073,9 +1074,15 @@ function startMode(m){
     if(!q.length)return toast('錯題本是空的');
     return runQueue(shuf(q).slice(0,25));
   }
+  const u=curUnit();
+  const fin=(S.course.phase||'n5')==='n4'
+    ? Object.keys(S.course.done2||{}).length>=14
+    : Object.keys(S.course.done||{}).length>=14;
+  if(!fin)setScope(u);                       // 單練一項也不要跳出當前進度的範圍
   const need=Math.max(1,(S.goals[m]||0)-doneToday(m));
   const q=pick(m,Math.max(need,10)).map(it=>({mode:m,it}));
-  if(!q.length)return toast('這個模式沒有題目');
+  DAYF=null; WEEKF=null;
+  if(!q.length)return toast(MODES.find(x=>x.k===m).n+'：目前的進度還沒有這種題目，先做別的');
   runQueue(q);
 }
 function runQueue(q){
@@ -1774,7 +1781,7 @@ function openDay(d){
     <div class="kv"><span>新單字</span><span>${esc(c.newV)}</span></div>
     <div class="kv"><span>單字練習池（含複習）</span><span>前 ${c.vEnd} 個 N5 單字</span></div>
     <div class="kv"><span>動詞練習池</span><span>${c.kEnd?('前 '+c.kEnd+' 個 N5 動詞'):'今天不練變化'}</span></div>
-    <div class="kv"><span>句子情境</span><span>${esc(dayTags(c.d).join('、'))}</span></div>
+    <div class="kv"><span>可用句子</span><span>${allSent().filter(s=>s.lv===5&&(s.step||1)<=c.d).length} 句（只含你學過的文法）</span></div>
     <div class="row"><button class="p" onclick="startDay(${c.d})">▶ 開始 Day ${c.d} 的練習</button></div>
     <div class="tiny" style="margin-top:8px">練習池是「累計」的，所以每天都會自動複習到前面幾天的內容。</div>`;
   box.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1884,7 +1891,7 @@ function saveCorrected(){
     if(!it.fixed||!it.kana||!it.zh)return;
     const j=it.fixed.includes('/')?it.fixed:it.fixed.split('').join(' / ');
     if(S.custom.sent.some(x=>x.k===it.kana))return;
-    S.custom.sent.push({j, k:it.kana, c:it.zh, lv:5}); n++;
+    S.custom.sent.push({j, k:it.kana, c:it.zh, lv:5, step:1}); n++;
   });
   save(); renderAll();
   toast(n?('存了 '+n+' 句進題庫'):'這些句子題庫裡已經有了');
