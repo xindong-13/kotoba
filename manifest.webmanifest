@@ -1,0 +1,17 @@
+{
+  "name": "コトバ Kotoba｜日文 N5→N1 每日訓練",
+  "short_name": "コトバ",
+  "description": "離線可用的日文訓練：單字、漢字讀音、動詞變化、助詞、組句、聽力，含間隔複習與 AI 導師。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1116",
+  "theme_color": "#0e1116",
+  "lang": "zh-Hant",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

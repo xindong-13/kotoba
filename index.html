@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1116">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>コトバ Kotoba</title>
+<style>
+:root{
+  --bg:#0e1116;--card:#161a21;--card2:#1d222b;--line:#2a303b;
+  --tx:#e9ecf1;--tx2:#8f98a8;--tx3:#5d6675;
+  --acc:#e05a5a;--acc2:#4a9eff;--ok:#3ecf8e;--warn:#f0b429;--purple:#a78bfa;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;overscroll-behavior-y:none}
+body{background:var(--bg);color:var(--tx);font-size:16px;line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Hiragino Sans","Yu Gothic",sans-serif;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom,0));-webkit-font-smoothing:antialiased}
+.jp{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP","Meiryo",sans-serif}
+header{position:sticky;top:0;z-index:40;background:rgba(14,17,22,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top,0)) 16px 11px}
+header .hr{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.03em}
+.hsub{font-size:11.5px;color:var(--tx2);margin-top:1px}
+main{max-width:720px;margin:0 auto;padding:14px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px}
+.card h2{font-size:14.5px;margin:0 0 9px;font-weight:700;display:flex;align-items:center;gap:7px;justify-content:space-between}
+.card h3{font-size:13px;margin:16px 0 7px;color:var(--tx2);font-weight:700;letter-spacing:.03em}
+.muted{color:var(--tx2);font-size:13px}
+.tiny{color:var(--tx3);font-size:11.5px;line-height:1.55}
+.pill{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--tx2);border:1px solid var(--line);white-space:nowrap}
+.pill.ok{background:rgba(62,207,142,.13);color:var(--ok);border-color:rgba(62,207,142,.3)}
+.pill.acc{background:rgba(224,90,90,.13);color:var(--acc);border-color:rgba(224,90,90,.3)}
+.pill.w{background:rgba(240,180,41,.13);color:var(--warn);border-color:rgba(240,180,41,.3)}
+.pill.b{background:rgba(74,158,255,.13);color:var(--acc2);border-color:rgba(74,158,255,.3)}
+button,.btn{font-family:inherit;font-size:14px;cursor:pointer;border-radius:10px;padding:11px 14px;
+  background:var(--card2);color:var(--tx);border:1px solid var(--line);transition:.13s;display:inline-block;text-align:center}
+button:active{transform:scale(.975)}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+button.g{background:transparent}
+button.sm{padding:7px 11px;font-size:12.5px}
+button:disabled{opacity:.4}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.row>button{flex:1;min-width:90px}
+input,select,textarea{font-family:inherit;font-size:15px;width:100%;padding:11px 12px;border-radius:10px;
+  background:var(--card2);border:1px solid var(--line);color:var(--tx);outline:none}
+input:focus,textarea:focus{border-color:var(--acc2)}
+label{font-size:12.5px;color:var(--tx2);display:block;margin:11px 0 5px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(22,26,33,.97);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+nav button{flex:1;background:none;border:none;border-radius:0;padding:8px 2px 7px;color:var(--tx2);
+  font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button .i{font-size:19px;line-height:1}
+nav button.on{color:var(--acc)}
+
+/* 每日目標 */
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.goal{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:9px 8px;text-align:center;cursor:pointer}
+.goal.done{border-color:rgba(62,207,142,.4);background:rgba(62,207,142,.07)}
+.goal .gn{font-size:11px;color:var(--tx2)}
+.goal .gv{font-size:15px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.goal .gb{height:3px;background:var(--line);border-radius:9px;margin-top:6px;overflow:hidden}
+.goal .gb i{display:block;height:100%;background:var(--acc);border-radius:9px;transition:.35s}
+.goal.done .gb i{background:var(--ok)}
+
+/* 練習卡 */
+.q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 16px;text-align:center;min-height:190px;
+  display:flex;flex-direction:column;justify-content:center}
+.qlab{font-size:11.5px;color:var(--tx3);letter-spacing:.06em;margin-bottom:9px}
+.qmain{font-size:32px;font-weight:600;line-height:1.4;word-break:break-word}
+.qmain.sm{font-size:23px}
+.qsub{font-size:14px;color:var(--tx2);margin-top:8px}
+.qhint{font-size:15px;color:var(--warn);margin-top:11px;font-weight:600}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:14px 13px;font-size:17px;
+  cursor:pointer;text-align:center;transition:.13s}
+.opt.right{background:rgba(62,207,142,.16);border-color:var(--ok);color:#a9f0cf}
+.opt.wrong{background:rgba(224,90,90,.16);border-color:var(--acc);color:#f6b3b3}
+.opt.dim{opacity:.4}
+.opt small{display:block;font-size:12px;color:var(--tx2);margin-top:3px}
+
+/* 重組 */
+.slot{min-height:62px;background:var(--card2);border:1px dashed var(--line);border-radius:12px;padding:10px;
+  display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.pool{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:17px;cursor:pointer}
+.chip.used{opacity:.22;pointer-events:none}
+.slot .chip{background:rgba(74,158,255,.14);border-color:rgba(74,158,255,.4)}
+.slot.right{border-color:var(--ok);border-style:solid}
+.slot.wrong{border-color:var(--acc);border-style:solid}
+
+/* 結果 */
+.res{margin-top:12px;padding:13px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+.res .rt{font-size:15px;font-weight:700}
+.res .ans{font-size:20px;margin-top:6px}
+.res .rd{font-size:13px;color:var(--acc2);margin-top:3px}
+.res .rc{font-size:13.5px;color:var(--tx2);margin-top:3px}
+
+/* 清單 */
+.li{border-bottom:1px solid var(--line);padding:11px 0;display:flex;gap:11px;align-items:flex-start}
+.li:last-child{border:none}
+.li .lw{font-size:17px;font-weight:600;min-width:88px}
+.li .lr{font-size:11.5px;color:var(--acc2);display:block;font-weight:400}
+.li .lm{font-size:13.5px;flex:1;color:var(--tx)}
+.li .ls{font-size:11.5px;color:var(--tx3)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv:last-child{border:none}
+.kv span:last-child{color:var(--tx2);text-align:right}
+
+/* 對話 */
+.chat{max-height:52vh;overflow-y:auto;padding:4px 0}
+.msg{margin-bottom:9px;display:flex}
+.msg .bub{max-width:82%;padding:10px 13px;border-radius:14px;font-size:14.5px;line-height:1.6;white-space:pre-wrap}
+.msg.me{justify-content:flex-end}
+.msg.me .bub{background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.msg.ai .bub{background:var(--card2);border:1px solid var(--line);border-bottom-left-radius:4px}
+
+/* 提示條 */
+.bar{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:70;
+  background:var(--acc2);color:#fff;border-radius:12px;padding:11px 14px;font-size:13.5px;display:none;
+  align-items:center;justify-content:space-between;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.bar.on{display:flex}
+.bar button{background:rgba(255,255,255,.22);border:none;color:#fff;padding:7px 12px;font-size:13px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0));
+  background:#000;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;z-index:90;opacity:0;
+  transition:.25s;pointer-events:none;max-width:88vw;text-align:center}
+#toast.on{opacity:.94}
+.dot{width:7px;height:7px;border-radius:9px;background:var(--acc);display:inline-block;margin-left:5px}
+details{border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-top:9px;background:var(--card2)}
+summary{cursor:pointer;font-size:13.5px;font-weight:600}
+pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:11px;font-size:11.5px;max-height:190px;overflow:auto;font-family:ui-monospace,monospace}
+.bar2{height:6px;background:var(--card2);border-radius:9px;overflow:hidden;margin-top:11px}
+.bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--warn));border-radius:9px;transition:.4s}
+.day{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:9px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.day.done{border-color:rgba(62,207,142,.4);background:rgba(62,207,142,.05)}
+.day.now{border-color:var(--acc);box-shadow:0 0 0 1px rgba(224,90,90,.25)}
+.day .dn{font-size:20px;font-weight:800;color:var(--tx3);min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+.day.done .dn{color:var(--ok)}.day.now .dn{color:var(--acc)}
+.day .dt{font-weight:700;font-size:15px}
+.day .dd{font-size:11.5px;color:var(--tx2);margin-top:2px}
+.sg{display:block;padding:9px 11px;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  margin-bottom:6px;font-size:13.5px;color:var(--tx);text-decoration:none}
+.sg b{color:var(--acc2)}
+.shad{text-align:center}
+.shad .sj{font-size:26px;line-height:1.5;font-weight:600}
+.shad .sk{font-size:15px;color:var(--acc2);margin-top:7px}
+.shad .sc{font-size:14px;color:var(--tx2);margin-top:5px}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.dots i{width:15px;height:15px;border-radius:99px;background:var(--card2);border:1px solid var(--line);display:block}
+.dots i.on{background:var(--ok);border-color:var(--ok)}
+.mic{font-size:12.5px;color:var(--tx2);margin-top:10px;min-height:18px}
+.kres{border-bottom:1px solid var(--line);padding:8px 0;display:flex;justify-content:space-between;font-size:14px}
+.kres:last-child{border:none}
+.wbar{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:13px}
+.wbar .wn{min-width:64px;color:var(--tx2)}
+.wbar .wt{flex:1;height:7px;background:var(--card2);border-radius:9px;overflow:hidden}
+.wbar .wt i{display:block;height:100%;border-radius:9px;transition:.4s}
+.wbar .wv{min-width:52px;text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
+.cx{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:var(--card2)}
+.cx.ok{border-color:rgba(62,207,142,.4)}
+.cx.minor{border-color:rgba(240,180,41,.45)}
+.cx.wrong{border-color:rgba(224,90,90,.45)}
+.cx .co{font-size:15px;color:var(--tx2);text-decoration:line-through;text-decoration-color:var(--acc)}
+.cx .co.keep{text-decoration:none;color:var(--tx)}
+.cx .cf{font-size:19px;margin-top:6px;font-weight:600}
+.cx .ck{font-size:12.5px;color:var(--acc2)}
+.cx .cw{font-size:13px;color:var(--tx2);margin-top:7px;padding-left:9px;border-left:2px solid var(--line)}
+.cx .cn{font-size:13px;color:var(--warn);margin-top:6px}
+.hide{display:none!important}
+@media(min-width:640px){.qmain{font-size:38px}.opts{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hr">
+    <div>
+      <h1 id="hTitle">コトバ Kotoba</h1>
+      <div class="hsub" id="hSub">日文 N5 → N1 每日訓練</div>
+    </div>
+    <div style="text-align:right">
+      <div class="pill acc" id="hStreak">連續 0 天</div>
+      <div class="tiny" id="hCount" style="margin-top:3px"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= 練習 ================= -->
+<section id="s-prac" class="on">
+  <div class="card" id="homeCard">
+    <h2>今天的目標 <span class="pill" id="goalAll"></span></h2>
+    <div class="goals" id="goalGrid"></div>
+    <div class="row"><button class="p" id="startBtn" onclick="startAuto()">▶ 開始練習</button></div>
+    <div class="tiny" style="margin-top:9px">「開始練習」會混合七種模式，範圍跟著課表走。點上面任一格可以只練那一項（不限範圍）。目標數字可在「我的 → 每日目標」調整。</div>
+  </div>
+
+  <div class="card" id="courseCard" onclick="go('course');openDay(S.course.cur||1)" style="cursor:pointer;border-color:rgba(74,158,255,.35)">
+    <h2>🗓️ <span id="ccTitle">14 天 N5 課表</span> <span class="pill b" id="ccPill"></span></h2>
+    <div class="muted" id="ccDesc"></div>
+  </div>
+
+  <div class="card" id="kanaCard">
+    <h2>⚡ 50 音速度測驗 <span class="pill" id="kanaBest"></span></h2>
+    <div class="muted">「會」跟「看到不用想」差很多。假名反應慢 0.5 秒，聽力就跟不上。40 題計時，測完會告訴你哪幾個字拖累你。</div>
+    <div class="row">
+      <button class="sm g" onclick="kanaSet('h')" id="kb-h">平假名</button>
+      <button class="sm g" onclick="kanaSet('k')" id="kb-k">片假名</button>
+      <button class="sm g" onclick="kanaSet('m')" id="kb-m">混合</button>
+    </div>
+    <div class="row">
+      <button class="sm g" onclick="kanaScope('basic')" id="ks-basic">只考清音</button>
+      <button class="sm g" onclick="kanaScope('all')" id="ks-all">全部（含濁音拗音）</button>
+    </div>
+    <div class="row"><button class="p" onclick="kanaStart()">開始測驗</button></div>
+  </div>
+
+  <div class="card hide" id="wrongCard" style="border-color:rgba(224,90,90,.4)">
+    <h2>📕 錯題本 <span class="pill acc" id="wrongN"></span></h2>
+    <div class="muted">答錯的會自動收進來，連續兩次答對就自動移出。</div>
+    <div class="row">
+      <button class="p" onclick="startMode('wrong')">複習錯題</button>
+      <button class="g" onclick="go('bank');bankTab('wrong')">看清單</button>
+    </div>
+  </div>
+
+  <div class="card hide" id="dueCard" style="border-color:rgba(240,180,41,.4)">
+    <h2>🔁 今天該複習 <span class="pill w" id="dueN"></span></h2>
+    <div class="muted">間隔複習排到期的項目。這些是「快要忘掉」的東西，先做這些 CP 值最高。</div>
+    <div class="row"><button class="p" onclick="startDue()">開始複習</button></div>
+  </div>
+
+  <div class="card" id="extraCard">
+    <h2>🔥 Extra 加練 <span class="pill" id="extraPill"></span></h2>
+    <div class="muted">今天比較有空？從這裡多吃一點。前兩個不會打亂課表進度。</div>
+    <div class="row">
+      <button onclick="startExtra(20)">加練 20 題<br><span class="tiny">同一天的範圍</span></button>
+      <button onclick="startWeak(15)">弱點特訓 15 題<br><span class="tiny">專挑你常錯的</span></button>
+    </div>
+    <div class="row">
+      <button onclick="unlockNext()" id="btnNext">提前上下一單元</button>
+      <button class="g" onclick="startAll(30)">全範圍挑戰 30 題</button>
+    </div>
+    <div class="tiny" id="extraNote" style="margin-top:8px"></div>
+  </div>
+
+  <div id="pracArea" class="hide">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+      <button class="sm g" onclick="prevQ()" id="btnPrev">← 上一題</button>
+      <div class="tiny" id="pracInfo"></div>
+      <button class="sm g" onclick="quitPrac()">結束</button>
+    </div>
+    <div id="qBox"></div>
+  </div>
+</section>
+
+<!-- ================= 課程 ================= -->
+<section id="s-course">
+  <div class="card">
+    <h2>🗓️ 14 天 N5 課表 <span class="pill" id="courseProg"></span></h2>
+    <div class="muted">文法講解看<a href="https://www.sigure.tw" target="_blank">時雨の町</a>，練習在這裡做。一天約 90 分鐘：讀 30 分、練 60 分。</div>
+    <div class="bar2" id="courseBar"><i></i></div>
+    <div class="row">
+      <button id="ph-n5" onclick="setPhase('n5')">① N5　14 天</button>
+      <button id="ph-n4" onclick="setPhase('n4')">② N4　14 週</button>
+    </div>
+  </div>
+  <div id="dayList"></div>
+  <div class="card hide" id="dayDetail"></div>
+</section>
+
+<!-- ================= 題庫 ================= -->
+<section id="s-bank">
+  <div class="card">
+    <h2>📚 題庫</h2>
+    <div class="row" id="bankTabs"></div>
+    <input id="bankSearch" placeholder="搜尋（中文、日文、假名都可以）" oninput="renderBank()" style="margin-top:10px">
+    <div class="tiny" id="bankCount" style="margin-top:7px"></div>
+  </div>
+  <div class="card"><div id="bankList"></div></div>
+  <div class="card">
+    <h2>➕ 自己加內容</h2>
+    <div class="row">
+      <button onclick="addCustom('vocab')">加單字</button>
+      <button onclick="addCustom('sent')">加句子</button>
+      <button class="p" onclick="aiGenBank()">✨ 用 AI 產生題庫</button>
+    </div>
+    <div class="tiny" style="margin-top:8px">用這裡加的東西存在你的資料裡，會走雲端同步，另一台自動就有，不用重傳檔案。</div>
+  </div>
+</section>
+
+<!-- ================= AI ================= -->
+<section id="s-ai">
+  <div class="card" id="aiNoKey">
+    <h2>🤖 AI 導師</h2>
+    <div class="muted">填一把免費金鑰就能用：句子拆解、文法問答、情境對話、檢討報告、AI 生題。</div>
+    <div class="row"><button class="p" onclick="go('me');setTimeout(()=>document.getElementById('aiPanel').open=true,100)">去設定金鑰</button></div>
+  </div>
+  <div class="card hide" id="aiTools">
+    <h2>🤖 AI 導師</h2>
+    <div class="row">
+      <button onclick="aiScene()">🎭 情境對話</button>
+      <button onclick="aiFree()">💬 自由聊天</button>
+    </div>
+    <div class="row">
+      <button onclick="aiAsk()">❓ 問文法問題</button>
+      <button onclick="aiReport()" id="btnReport">📋 產生檢討報告</button>
+    </div>
+  </div>
+  <div class="card hide" id="correctCard">
+    <h2>✍️ 句子批改 <span class="pill b" id="corrHint"></span></h2>
+    <div class="muted">用今天的句型自己寫幾句，一行一句，貼進來按批改。這是唯一能把「認得」變成「寫得出來」的練習。</div>
+    <div class="tiny" id="corrGram" style="margin:8px 0"></div>
+    <textarea id="corrIn" rows="6" placeholder="一行一句，例如：&#10;私は台湾人です。&#10;これは私の傘じゃありません。&#10;あの人は先生です。"></textarea>
+    <div class="row">
+      <button class="p" onclick="aiCorrect()" id="corrBtn">批改</button>
+      <button class="g" onclick="document.getElementById('corrIn').value=''">清空</button>
+    </div>
+    <div id="corrOut"></div>
+  </div>
+
+  <div class="card hide" id="aiChatCard">
+    <h2><span id="aiChatTitle">對話</span><button class="sm g" onclick="aiEnd()">結束</button></h2>
+    <div class="chat" id="aiChat"></div>
+    <div style="display:flex;gap:7px;margin-top:9px">
+      <input id="aiInput" placeholder="輸入…（中文日文都可以）" onkeydown="if(event.key==='Enter')aiSend()">
+      <button class="p" onclick="aiSend()" style="flex:0 0 auto">送出</button>
+    </div>
+  </div>
+  <div class="card hide" id="aiOut"></div>
+  <div class="card">
+    <h2>📋 過去的報告</h2>
+    <div id="reportList"><div class="tiny">還沒有報告。</div></div>
+  </div>
+</section>
+
+<!-- ================= 我的 ================= -->
+<section id="s-me">
+  <div class="card">
+    <h2>📈 學習狀況</h2>
+    <div class="kv"><span>連續天數</span><span id="stStreak">0 天</span></div>
+    <div class="kv"><span>累計練習題數</span><span id="stTotal">0</span></div>
+    <div class="kv"><span>已接觸的項目</span><span id="stSeen">0</span></div>
+    <div class="kv"><span>熟練（間隔 &gt; 20 天）</span><span id="stMature">0</span></div>
+    <div class="kv"><span>錯題本</span><span id="stWrong">0</span></div>
+    <div class="kv"><span>今天該複習</span><span id="stDue">0</span></div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 弱點分析 <button class="sm g" onclick="startWeak(15)">弱點特訓</button></h2>
+    <div id="weakBox"></div>
+  </div>
+
+  <details id="goalPanel">
+    <summary>🎯 每日目標</summary>
+    <div id="goalSet"></div>
+    <div class="tiny" style="margin-top:9px">設 0 就是不列入當天目標。全部加起來建議 30～50 題，配合每天 25 分鐘的單字時段。</div>
+  </details>
+
+  <details>
+    <summary>🔊 發音設定</summary>
+    <label>語速 <span id="rateV">1.0</span> 倍</label>
+    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="1" oninput="setRate(this.value)">
+    <label>日文語音</label>
+    <select id="voiceSel" onchange="setVoice(this.value)"></select>
+    <div class="row"><button onclick="speak('日本語の練習を始めましょう。')">🔊 試聽</button></div>
+    <div class="tiny" style="margin-top:8px">找不到日文語音的話：iPhone 設定 → 輔助使用 → 朗讀內容 → 聲音 → 日文，下載一個。</div>
+  </details>
+
+  <details id="aiPanel">
+    <summary>🤖 AI 設定</summary>
+    <label>供應商</label>
+    <select id="prov" onchange="setProv(this.value)">
+      <option value="gemini">Google Gemini（免費）</option>
+      <option value="claude">Anthropic Claude（付費）</option>
+    </select>
+    <label>API 金鑰</label>
+    <input id="apikey" type="password" placeholder="貼上金鑰" onchange="saveKey(this.value)">
+    <label>模型</label>
+    <input id="model" placeholder="留空用預設" onchange="saveModel(this.value)">
+    <div class="row">
+      <button onclick="testAI()">測試連線</button>
+      <button class="g" onclick="probeModels()">🔍 偵測可用模型</button>
+    </div>
+    <div class="tiny" id="aiStatus" style="margin-top:8px"></div>
+    <div class="tiny" style="margin-top:8px">Gemini 免費金鑰：aistudio.google.com/apikey，不用信用卡。金鑰只存在這台裝置，不會上傳，也不走第三方伺服器。</div>
+  </details>
+
+  <details id="syncPanel">
+    <summary>☁️ 雲端同步 <span id="syncDot"></span></summary>
+    <div class="tiny" id="syncState"></div>
+    <label>Supabase Project URL</label>
+    <input id="supaUrl" placeholder="https://xxxx.supabase.co" onchange="saveSupa()">
+    <label>Publishable / anon 金鑰</label>
+    <input id="supaKey" type="password" placeholder="sb_publishable_… 或 eyJ…" onchange="saveSupa()">
+    <label>同步代碼（兩台要一模一樣）</label>
+    <div style="display:flex;gap:7px">
+      <input id="supaCode" onchange="saveSupa()">
+      <button class="sm" onclick="genCode()" style="flex:0 0 auto">產生</button>
+    </div>
+    <div class="row">
+      <button class="p" onclick="supaTest()">儲存並測試連線</button>
+      <button onclick="syncNow()">🔄 立即同步</button>
+    </div>
+    <div class="row">
+      <button class="g sm" onclick="copySync()">📋 複製整組設定給另一台</button>
+      <button class="g sm" onclick="pasteSync()">📥 貼上另一台的設定</button>
+    </div>
+    <details style="margin-top:10px">
+      <summary>第一次設定要跑的 SQL</summary>
+      <pre id="sqlText"></pre>
+      <div class="row"><button class="sm" onclick="copySQL()">📋 複製這段 SQL</button></div>
+      <div class="tiny">貼到 Supabase 左側 SQL Editor → New query → Run，看到 Success 就好。</div>
+    </details>
+  </details>
+
+  <details id="backupPanel">
+    <summary>💾 備份與資料 <span id="bkDot"></span></summary>
+    <div class="tiny" id="bkState"></div>
+    <div class="row">
+      <button class="p" onclick="copyBackup()">📋 複製備份碼</button>
+      <button onclick="pasteBackup()">📥 貼上備份碼還原</button>
+    </div>
+    <div class="row">
+      <button class="g sm" onclick="fileBackup()">存成檔案</button>
+      <button class="g sm" onclick="fileRestore()">讀取檔案</button>
+    </div>
+    <div class="row"><button class="g sm" onclick="wipe()" style="color:var(--acc)">清除全部資料</button></div>
+    <div class="tiny" style="margin-top:9px">資料同時寫進 localStorage 和 IndexedDB，其中一個被清掉會自動救回，但兩個一起被清就沒了。每週複製一次備份碼貼到備忘錄最保險。</div>
+  </details>
+
+  <details>
+    <summary>⏰ 怎麼設每天提醒</summary>
+    <div class="tiny" style="line-height:1.8">
+      iPhone 網頁 App 不能主動推播，但「捷徑」App 可以做到一樣的事：<br>
+      1. 打開<b>捷徑</b> → 下方切到<b>自動化</b> → 右上 <b>＋</b> → 選<b>時間</b><br>
+      2. 挑一個固定有空的時間，重複選<b>每天</b><br>
+      3. 選<b>立即執行</b>，把「執行前先詢問」<b>關掉</b><br>
+      4. <b>下一步</b> → 搜尋<b>「打開 App」</b> → 選 <b>コトバ</b> → 完成
+    </div>
+  </details>
+
+  <details>
+    <summary>ℹ️ 關於</summary>
+    <div class="kv"><span>版本</span><span id="verTxt">—</span></div>
+    <div class="kv"><span>單字</span><span id="cntVocab">—</span></div>
+    <div class="kv"><span>動詞</span><span id="cntVerb">—</span></div>
+    <div class="kv"><span>文法</span><span id="cntGram">—</span></div>
+    <div class="kv"><span>句子</span><span id="cntSent">—</span></div>
+    <div class="row"><button class="g sm" onclick="checkUpdate(true)">檢查更新</button></div>
+  </details>
+</section>
+
+</main>
+
+<nav>
+  <button class="on" data-s="prac"><span class="i">🎯</span>練習</button>
+  <button data-s="course"><span class="i">🗓️</span>課程</button>
+  <button data-s="bank"><span class="i">📚</span>題庫</button>
+  <button data-s="ai"><span class="i">🤖</span>AI</button>
+  <button data-s="me"><span class="i">👤</span>我的</button>
+</nav>
+
+<div class="bar" id="updBar"><span>有新版本可以更新</span><button onclick="doUpdate()">更新</button></div>
+<div id="toast"></div>
+
+<script src="./bank-vocab.js"></script>
+<script src="./bank-verb.js"></script>
+<script src="./bank-grammar.js"></script>
+<script src="./bank-sentence.js"></script>
+<script src="./bank-course.js"></script>
+<script src="./bank-kana.js"></script>
+<script>
+/* ======================================================================
+   コトバ Kotoba — 核心：題庫解析／儲存／間隔複習／同步／AI
+   ====================================================================== */
+const APPVER='kotoba-v7';
+const KEY='kotoba_data_v1';
+const IDB_DB='kotoba', IDB_ST='kv';
+
+/* ---------- 題庫解析 ---------- */
+function lines(s){return (s||'').trim().split('\n').filter(x=>x.trim())}
+const VOCAB = lines(window.VOCAB_RAW).map((l,i)=>{
+  const[w,r,m,p,lv]=l.split('|'); return {id:'v'+i,w,r,m,p,lv:+lv};
+});
+const VERBS = lines(window.VERB_RAW).map((l,i)=>{
+  const[d,r,m,t,lv]=l.split('|'); const o={id:'k'+i,d,r,m,t:+t,lv:+lv};
+  if(d==='行く')o.x='iku'; if(d==='ある')o.x='aru'; return o;
+});
+const PAIRS = lines(window.PAIR_RAW).map((l,i)=>{
+  const[a,ar,b,br,m]=l.split('|'); return {id:'p'+i,a,ar,b,br,m};
+});
+const GRAM = lines(window.GRAMMAR_RAW).map((l,i)=>{
+  const[p,m,c,e,ek,et,lv]=l.split('|'); return {id:'g'+i,p,m,c,e,ek,et,lv:+lv};
+});
+const SENT = lines(window.SENT_RAW).map((l,i)=>{
+  const[j,k,c,tag,lv]=l.split('|');
+  const ch=j.split('/').map(x=>x.trim()).filter(Boolean);
+  return {id:'s'+i,j:ch.join(''),ch,k,c,tag,lv:+lv};
+});
+const PARTICLES=['は','が','を','に','で','へ','と','も','から','まで','より','の'];
+
+/* ---------- 預設狀態 ---------- */
+function fresh(){return{
+  v:1, srs:{}, wrong:{}, log:{}, streak:0, lastDay:'', total:0,
+  goals:{vocab:10,kanji:8,verb:8,part:6,build:5,listen:5,shadow:5},
+  rate:1, voice:'', prov:'gemini', keys:{}, models:{},
+  supa:{url:'',key:'',code:'',on:false},
+  custom:{vocab:[],sent:[]}, reports:[], lastBackup:0, updated:0,
+  course:{cur:1,done:{},cur2:1,done2:{},phase:'n5'}, kana:{},
+  stat:{mode:{},form:{},part:{}}, extra:{}
+};}
+let S=fresh();
+
+/* ---------- localStorage + IndexedDB 雙寫 ---------- */
+function idb(){return new Promise((res,rej)=>{
+  if(!window.indexedDB)return rej(new Error('no-idb'));
+  const q=indexedDB.open(IDB_DB,1);
+  q.onupgradeneeded=()=>{q.result.createObjectStore(IDB_ST)};
+  q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error);
+});}
+async function idbSet(v){try{const d=await idb();return new Promise(r=>{
+  const t=d.transaction(IDB_ST,'readwrite');t.objectStore(IDB_ST).put(v,KEY);t.oncomplete=()=>r();t.onerror=()=>r();
+});}catch(e){}}
+async function idbGet(){try{const d=await idb();return new Promise(r=>{
+  const t=d.transaction(IDB_ST,'readonly');const q=t.objectStore(IDB_ST).get(KEY);
+  q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);
+});}catch(e){return null}}
+
+let saveT=null;
+function save(){
+  S.updated=Date.now();
+  const raw=JSON.stringify(S);
+  try{localStorage.setItem(KEY,raw)}catch(e){toast('本機空間已滿，請先複製備份碼')}
+  clearTimeout(saveT); saveT=setTimeout(()=>idbSet(raw),400);
+}
+async function load(){
+  let raw=null;
+  try{raw=localStorage.getItem(KEY)}catch(e){}
+  const back=await idbGet();
+  if(!raw&&back){raw=back;try{localStorage.setItem(KEY,raw)}catch(e){}toast('已從備援儲存救回你的進度')}
+  if(raw){try{S=Object.assign(fresh(),JSON.parse(raw));
+    S.goals=Object.assign(fresh().goals,S.goals||{});
+    S.supa=Object.assign(fresh().supa,S.supa||{});
+    S.custom=Object.assign(fresh().custom,S.custom||{});
+    S.course=Object.assign(fresh().course,S.course||{});
+    S.stat=Object.assign(fresh().stat,S.stat||{});
+    S.stat.mode=S.stat.mode||{};S.stat.form=S.stat.form||{};S.stat.part=S.stat.part||{};
+  }catch(e){}}
+}
+
+/* ---------- 小工具 ---------- */
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2100)}
+function today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function clip(t){try{await navigator.clipboard.writeText(t);return true}catch(e){
+  const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+  try{document.execCommand('copy')}catch(e2){}a.remove();return true}}
+async function readClip(){try{return await navigator.clipboard.readText()}catch(e){return prompt('貼上內容：')||''}}
+
+/* ---------- 間隔複習 ---------- */
+const STEPS=[1,3,8,20,45,100];
+function srsKey(mode,id){return mode+':'+id}
+function srsGet(k){return S.srs[k]||{n:0,due:0,ok:0,ng:0}}
+function srsHit(mode,id,good){
+  const k=srsKey(mode,id), r=srsGet(k);
+  if(good){ r.n=Math.min(r.n+1,STEPS.length-1); r.ok++; }
+  else { r.n=0; r.ng++; }
+  r.due=Date.now()+STEPS[r.n]*864e5;
+  r.last=Date.now();
+  S.srs[k]=r;
+  // 錯題本
+  if(!good){ S.wrong[k]={mode,id,t:Date.now(),streak:0}; }
+  else if(S.wrong[k]){ S.wrong[k].streak=(S.wrong[k].streak||0)+1; if(S.wrong[k].streak>=2) delete S.wrong[k]; }
+  S.total++;
+  // 每日進度
+  const d=today(); if(!S.log[d])S.log[d]={};
+  S.log[d][mode]=(S.log[d][mode]||0)+1;
+  bumpStreak();
+  save();
+}
+function bumpStreak(){
+  const d=today();
+  if(S.lastDay===d)return;
+  const y=new Date(Date.now()-864e5); const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
+  S.streak = (S.lastDay===ys)? S.streak+1 : 1;
+  S.lastDay=d;
+}
+function dueCount(){const n=Date.now();return Object.values(S.srs).filter(r=>r.due&&r.due<=n).length}
+function doneToday(mode){const d=S.log[today()]||{};return d[mode]||0}
+
+/* ---------- 語音 ---------- */
+let VOICES=[];
+function loadVoices(){
+  VOICES=(speechSynthesis.getVoices()||[]).filter(v=>/ja/i.test(v.lang));
+  const sel=document.getElementById('voiceSel');
+  if(!sel)return;
+  sel.innerHTML=VOICES.length? VOICES.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}</option>`).join('')
+    : '<option>（這台裝置沒有日文語音）</option>';
+  if(S.voice)sel.value=S.voice;
+}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=loadVoices;}
+function speak(t,cb){
+  if(!('speechSynthesis' in window)){cb&&cb();return}
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang='ja-JP'; u.rate=S.rate||1;
+    const v=VOICES.find(x=>x.name===S.voice)||VOICES[0];
+    if(v)u.voice=v;
+    if(cb)u.onend=cb;
+    speechSynthesis.speak(u);
+  }catch(e){cb&&cb()}
+}
+function setRate(v){S.rate=+v;document.getElementById('rateV').textContent=(+v).toFixed(1);save()}
+function setVoice(v){S.voice=v;save()}
+
+/* ======================================================================
+   AI（Gemini / Claude）
+   ====================================================================== */
+const GEM_MODELS=['gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash','gemini-flash-lite-latest','gemini-2.5-flash-lite'];
+const CLA_MODELS=['claude-haiku-4-5','claude-sonnet-4-5'];
+function aiKey(){return (S.keys||{})[S.prov]||''}
+function aiModel(){return (S.models||{})[S.prov]||''}
+function hasAI(){return !!aiKey()}
+
+async function askAI(prompt,sys,maxTok){
+  const key=aiKey(); if(!key)throw new Error('沒有金鑰');
+  maxTok=maxTok||1200;
+  if(S.prov==='claude'){
+    const list=aiModel()?[aiModel()]:CLA_MODELS;
+    let err;
+    for(const m of list){
+      try{
+        const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+          headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body:JSON.stringify({model:m,max_tokens:maxTok,system:sys||'',messages:[{role:'user',content:prompt}]})});
+        const j=await r.json();
+        if(!r.ok)throw new Error(j.error?.message||('HTTP '+r.status));
+        S.models.claude=m;save();
+        return (j.content||[]).map(c=>c.text||'').join('').trim();
+      }catch(e){err=e}
+    }
+    throw err;
+  }
+  const list=aiModel()?[aiModel()]:GEM_MODELS;
+  let err;
+  for(const m of list){
+    try{
+      const url=`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`;
+      const body={contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:maxTok,temperature:.7}};
+      if(sys)body.systemInstruction={parts:[{text:sys}]};
+      const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+      const j=await r.json();
+      if(!r.ok)throw new Error(j.error?.message||('HTTP '+r.status));
+      const t=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+      if(!t)throw new Error('空回應');
+      S.models.gemini=m;save();
+      return t;
+    }catch(e){err=e}
+  }
+  throw err;
+}
+function digJSON(t){
+  if(!t)return null;
+  let s=t.replace(/```json/gi,'```').split('```').filter(x=>x.trim());
+  const cands=[t].concat(s);
+  for(const c of cands){
+    const i=c.indexOf('['),j=c.lastIndexOf(']'),a=c.indexOf('{'),b=c.lastIndexOf('}');
+    for(const[x,y] of [[i,j],[a,b]]){
+      if(x>-1&&y>x){try{return JSON.parse(c.slice(x,y+1))}catch(e){}}
+    }
+  }
+  return null;
+}
+function setProv(v){S.prov=v;save();document.getElementById('apikey').value=aiKey();document.getElementById('model').value=aiModel();refreshAI()}
+function saveKey(v){S.keys[S.prov]=v.trim();save();toast('已儲存金鑰');refreshAI()}
+function saveModel(v){S.models[S.prov]=v.trim();save();toast('已儲存模型')}
+async function testAI(){
+  const st=document.getElementById('aiStatus');
+  st.textContent='測試中…';
+  try{const r=await askAI('回覆兩個字：成功','',30);st.innerHTML='<span style="color:var(--ok)">連線成功 ✅ '+esc(aiModel()||'')+'</span>';}
+  catch(e){st.innerHTML='<span style="color:var(--acc)">失敗：'+esc(e.message)+'</span>'}
+}
+async function probeModels(){
+  const st=document.getElementById('aiStatus');const list=S.prov==='claude'?CLA_MODELS:GEM_MODELS;
+  st.textContent='偵測中…';
+  for(const m of list){
+    S.models[S.prov]=m;
+    try{await askAI('hi','',10);st.innerHTML='<span style="color:var(--ok)">可用：'+esc(m)+'（已自動選用）</span>';save();
+      document.getElementById('model').value=m;return}
+    catch(e){}
+  }
+  S.models[S.prov]='';save();st.innerHTML='<span style="color:var(--acc)">都不可用，請確認金鑰</span>';
+}
+function refreshAI(){
+  const has=hasAI();
+  document.getElementById('aiNoKey').classList.toggle('hide',has);
+  document.getElementById('aiTools').classList.toggle('hide',!has);
+}
+
+/* ======================================================================
+   雲端同步（Supabase）
+   ====================================================================== */
+const SQL=`create table if not exists kotoba_sync (
+  code text primary key,
+  data jsonb not null,
+  updated_at timestamptz not null default now()
+);
+alter table kotoba_sync enable row level security;
+drop policy if exists kotoba_all on kotoba_sync;
+create policy kotoba_all on kotoba_sync for all using (true) with check (true);`;
+
+function saveSupa(){
+  S.supa.url=(document.getElementById('supaUrl').value||'').trim().replace(/\/+$/,'');
+  S.supa.key=(document.getElementById('supaKey').value||'').trim();
+  S.supa.code=(document.getElementById('supaCode').value||'').trim();
+  if(S.supa.url&&!/^https?:\/\//.test(S.supa.url))S.supa.url='https://'+S.supa.url;
+  save();
+}
+function genCode(){
+  const c='K'+Math.random().toString(36).slice(2,8).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase();
+  document.getElementById('supaCode').value=c;saveSupa();
+}
+function supaHead(){return{'apikey':S.supa.key,'authorization':'Bearer '+S.supa.key,'content-type':'application/json'}}
+async function supaTest(){
+  saveSupa();
+  const st=document.getElementById('syncState');
+  if(!S.supa.url||!S.supa.key||!S.supa.code){st.innerHTML='<span style="color:var(--acc)">三個欄位都要填</span>';return}
+  st.textContent='測試中…';
+  try{
+    const r=await fetch(S.supa.url+'/rest/v1/kotoba_sync?select=code&limit=1',{headers:supaHead()});
+    if(!r.ok){
+      const t=await r.text();
+      if(/does not exist|relation/i.test(t)){st.innerHTML='<span style="color:var(--acc)">找不到資料表 → 請先去 Supabase 跑那段 SQL</span>';return}
+      if(r.status===401||r.status===403){st.innerHTML='<span style="color:var(--acc)">金鑰不對或權限不足（要用 Publishable / anon，不要用 Secret）</span>';return}
+      throw new Error('HTTP '+r.status);
+    }
+    S.supa.on=true;save();
+    st.innerHTML='<span style="color:var(--ok)">雲端同步已啟用 ✅</span>';
+    await syncNow();
+  }catch(e){st.innerHTML='<span style="color:var(--acc)">失敗：'+esc(e.message)+'</span>'}
+  syncDot();
+}
+function mergeState(a,b){
+  // 兩份合併，取「練得比較多」的那邊
+  const o=(b.updated||0)>(a.updated||0)?Object.assign({},a,b):Object.assign({},b,a);
+  o.srs={};
+  const keys=new Set([...Object.keys(a.srs||{}),...Object.keys(b.srs||{})]);
+  keys.forEach(k=>{
+    const x=a.srs?.[k],y=b.srs?.[k];
+    if(!x)return void(o.srs[k]=y); if(!y)return void(o.srs[k]=x);
+    o.srs[k]=((x.last||0)>=(y.last||0))?x:y;
+  });
+  o.wrong=Object.assign({},b.wrong||{},a.wrong||{});
+  o.log=Object.assign({},b.log||{},a.log||{});
+  Object.keys(b.log||{}).forEach(d=>{
+    if(a.log&&a.log[d]){o.log[d]={};new Set([...Object.keys(a.log[d]),...Object.keys(b.log[d])]).forEach(m=>{
+      o.log[d][m]=Math.max(a.log[d][m]||0,b.log[d][m]||0)})}
+  });
+  o.course={cur:Math.max(a.course?.cur||1,b.course?.cur||1),
+            cur2:Math.max(a.course?.cur2||1,b.course?.cur2||1),
+            phase:(a.updated||0)>=(b.updated||0)?(a.course?.phase||'n5'):(b.course?.phase||'n5'),
+            done:Object.assign({},b.course?.done||{},a.course?.done||{}),
+            done2:Object.assign({},b.course?.done2||{},a.course?.done2||{})};
+  o.kana={best:Math.min(a.kana?.best||9e9,b.kana?.best||9e9)===9e9?undefined:Math.min(a.kana?.best||9e9,b.kana?.best||9e9),
+          mode:a.kana?.mode||b.kana?.mode, scope:a.kana?.scope||b.kana?.scope,
+          last:((a.kana?.last?.t||0)>=(b.kana?.last?.t||0))?a.kana?.last:b.kana?.last};
+  o.stat={mode:mergeCnt(a.stat?.mode,b.stat?.mode),form:mergeCnt(a.stat?.form,b.stat?.form),part:mergeCnt(a.stat?.part,b.stat?.part)};
+  o.extra=Object.assign({},b.extra||{},a.extra||{});
+  o.total=Math.max(a.total||0,b.total||0);
+  o.streak=Math.max(a.streak||0,b.streak||0);
+  o.custom={vocab:dedupe([...(a.custom?.vocab||[]),...(b.custom?.vocab||[])]),
+            sent:dedupe([...(a.custom?.sent||[]),...(b.custom?.sent||[])])};
+  o.reports=[...(a.reports||[]),...(b.reports||[])]
+    .filter((r,i,arr)=>arr.findIndex(z=>z.t===r.t)===i).sort((x,y)=>y.t-x.t).slice(0,20);
+  o.keys=S.keys; o.models=S.models; o.supa=S.supa;   // 金鑰不同步
+  return o;
+}
+function mergeCnt(x,y){
+  x=x||{};y=y||{};const o={};
+  new Set([...Object.keys(x),...Object.keys(y)]).forEach(k=>{
+    const p=x[k]||{ok:0,ng:0}, q=y[k]||{ok:0,ng:0};
+    o[k]={ok:Math.max(p.ok||0,q.ok||0), ng:Math.max(p.ng||0,q.ng||0)};
+  });
+  return o;
+}
+function dedupe(a){const s=new Set();return a.filter(x=>{const k=JSON.stringify(x);if(s.has(k))return false;s.add(k);return true})}
+let syncing=false;
+async function syncNow(quiet){
+  if(!S.supa.on||!S.supa.url||!S.supa.code||syncing)return;
+  syncing=true;
+  try{
+    const r=await fetch(S.supa.url+'/rest/v1/kotoba_sync?code=eq.'+encodeURIComponent(S.supa.code)+'&select=data',{headers:supaHead()});
+    if(r.ok){
+      const j=await r.json();
+      if(j[0]&&j[0].data){ S=mergeState(S,j[0].data); }
+    }
+    const body=JSON.stringify({code:S.supa.code,data:S,updated_at:new Date().toISOString()});
+    await fetch(S.supa.url+'/rest/v1/kotoba_sync?on_conflict=code',{method:'POST',
+      headers:Object.assign(supaHead(),{'prefer':'resolution=merge-duplicates'}),body});
+    save(); renderAll();
+    if(!quiet)toast('同步完成');
+    S.supa.err='';
+  }catch(e){S.supa.err=e.message;if(!quiet)toast('同步失敗：'+e.message)}
+  syncing=false; syncDot();
+}
+function syncDot(){
+  const d=document.getElementById('syncDot');
+  d.innerHTML=S.supa.on? (S.supa.err?'<span class="dot"></span>':'<span class="pill ok">已啟用</span>') : '';
+  const st=document.getElementById('syncState');
+  if(S.supa.err)st.innerHTML='<span style="color:var(--acc)">上次同步失敗：'+esc(S.supa.err)+'</span>';
+}
+async function copySync(){
+  saveSupa();
+  await clip('KOTOBASYNC1:'+btoa(unescape(encodeURIComponent(JSON.stringify({u:S.supa.url,k:S.supa.key,c:S.supa.code})))));
+  toast('已複製，傳給另一台裝置');
+}
+async function pasteSync(){
+  const t=await readClip();
+  if(!t.startsWith('KOTOBASYNC1:'))return toast('格式不對');
+  try{const o=JSON.parse(decodeURIComponent(escape(atob(t.slice(12)))));
+    S.supa.url=o.u;S.supa.key=o.k;S.supa.code=o.c;save();fillSupa();supaTest();
+  }catch(e){toast('解析失敗')}
+}
+function fillSupa(){
+  document.getElementById('supaUrl').value=S.supa.url||'';
+  document.getElementById('supaKey').value=S.supa.key||'';
+  document.getElementById('supaCode').value=S.supa.code||'';
+}
+function copySQL(){clip(SQL);toast('已複製 SQL')}
+
+/* ---------- 備份 ---------- */
+async function copyBackup(){
+  await clip('KOTOBA1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S)))));
+  S.lastBackup=Date.now();save();bkDot();toast('備份碼已複製，貼到備忘錄');
+}
+async function pasteBackup(){
+  const t=await readClip();
+  if(!t.trim().startsWith('KOTOBA1:'))return toast('這不是備份碼');
+  try{ S=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(t.trim().slice(8))))));
+    save();renderAll();toast('還原完成');
+  }catch(e){toast('還原失敗：'+e.message)}
+}
+function fileBackup(){
+  const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='kotoba-backup-'+today()+'.json';a.click();
+  S.lastBackup=Date.now();save();bkDot();
+}
+function fileRestore(){
+  const i=document.createElement('input');i.type='file';i.accept='.json';
+  i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{S=Object.assign(fresh(),JSON.parse(r.result));save();renderAll();toast('還原完成')}catch(e){toast('檔案壞了')}};
+    r.readAsText(f)};
+  i.click();
+}
+function bkDot(){
+  const days=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/864e5):999;
+  document.getElementById('bkDot').innerHTML=days>7?'<span class="dot"></span>':'';
+  document.getElementById('bkState').innerHTML = S.lastBackup
+    ? (days>7?'<span style="color:var(--acc)">已經 '+days+' 天沒備份了</span>':'上次備份：'+days+' 天前')
+    : '<span style="color:var(--acc)">還沒備份過</span>';
+}
+function wipe(){
+  if(!confirm('確定清除全部學習資料？備份碼還原得回來，沒有備份就沒了。'))return;
+  try{localStorage.removeItem(KEY)}catch(e){}
+  idbSet('');S=fresh();save();renderAll();toast('已清除');
+}
+
+/* ---------- 自動更新 ---------- */
+let waitingSW=null;
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      w&&w.addEventListener('statechange',()=>{
+        if(w.state==='installed'&&navigator.serviceWorker.controller){waitingSW=reg.waiting||w;document.getElementById('updBar').classList.add('on')}
+      });
+    });
+    setInterval(()=>reg.update(),36e5);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update()});
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
+}
+function doUpdate(){ if(waitingSW)waitingSW.postMessage('SKIP_WAITING'); else location.reload(); }
+function checkUpdate(manual){
+  if(!('serviceWorker' in navigator))return toast('這個瀏覽器不支援');
+  navigator.serviceWorker.getRegistration().then(r=>{r&&r.update();manual&&toast('已檢查，有新版會跳出提示')});
+}
+
+/* ======================================================================
+   コトバ Kotoba — 練習模式／畫面
+   ====================================================================== */
+const HAS_KANJI=/[一-鿿]/;
+const MODES=[
+  {k:'vocab', n:'單字',   i:'🃏', d:'中日互選，先把量堆起來'},
+  {k:'kanji', n:'漢字',   i:'㊙️', d:'看漢字選讀音，別再用中文猜'},
+  {k:'verb',  n:'動詞',   i:'⚡', d:'變化反射訓練，初期投報率最高'},
+  {k:'part',  n:'助詞',   i:'🔗', d:'は・が・を・に・で，失分重災區'},
+  {k:'build', n:'組句',   i:'🧩', d:'看中文把日文句子拼出來'},
+  {k:'listen',n:'聽力',   i:'🎧', d:'只給聲音，漢字幫不上忙的那一科'},
+  {k:'shadow',n:'跟讀',   i:'🗣️', d:'播一次跟一次，練到嘴巴跟得上'}
+];
+const KANA = lines(window.KANA_RAW).map((l,i)=>{
+  const[h,k,r,g]=l.split('|'); return {id:'n'+i,h,k,r,g};
+});
+function allVocab(){return VOCAB.concat((S.custom.vocab||[]).map((x,i)=>({id:'cv'+i,w:x.w,r:x.r,m:x.m,p:x.p||'名',lv:x.lv||5})))}
+function allSent(){return SENT.concat((S.custom.sent||[]).map((x,i)=>{
+  const ch=(x.j||'').split('/').map(s=>s.trim()).filter(Boolean);
+  return {id:'cs'+i,j:ch.join(''),ch,k:x.k||'',c:x.c||'',tag:'自訂',lv:x.lv||5};
+}))}
+function poolRaw(mode){
+  if(mode==='vocab')return allVocab();
+  if(mode==='kanji')return allVocab().filter(v=>HAS_KANJI.test(v.w)&&v.w!==v.r);
+  if(mode==='verb') return VERBS;
+  if(mode==='part') return allSent().filter(s=>s.ch.some(c=>PARTICLES.includes(c)));
+  if(mode==='build')return allSent().filter(s=>s.ch.length>=3&&s.ch.length<=9);
+  if(mode==='listen'||mode==='shadow')return allSent().filter(s=>s.c&&s.k);
+  return [];
+}
+let DAYF=null, WEEKF=null;
+function n4v(){return allVocab().filter(v=>v.lv===4)}
+function n4k(){return VERBS.filter(v=>v.lv===4)}
+function weekTags(w){const t=[];for(let i=0;i<w;i++)t.push(...COURSE2[i].tags);return t}
+function n5v(){return allVocab().filter(v=>v.lv===5)}
+function n5k(){return VERBS.filter(v=>v.lv===5)}
+function dayTags(d){const t=[];for(let i=0;i<d;i++)t.push(...COURSE[i].tags);return t}
+function poolFor(mode){
+  let p=poolRaw(mode);
+  if(WEEKF){
+    if(mode==='vocab'||mode==='kanji'){
+      const ids=new Set([...n5v(),...n4v().slice(0,WEEKF.vEnd)].map(v=>v.id));
+      return p.filter(x=>ids.has(x.id));
+    }
+    if(mode==='verb'){
+      const ids=new Set([...n5k(),...n4k().slice(0,WEEKF.kEnd)].map(v=>v.id));
+      return p.filter(x=>ids.has(x.id));
+    }
+    const tg=new Set(weekTags(WEEKF.w));
+    return p.filter(x=>x.lv===5||tg.has(x.tag));
+  }
+  if(!DAYF)return p;
+  if(mode==='vocab'||mode==='kanji'){
+    const ids=new Set(n5v().slice(0,DAYF.vEnd).map(v=>v.id));
+    return p.filter(x=>ids.has(x.id));
+  }
+  if(mode==='verb'){
+    const ids=new Set(n5k().slice(0,DAYF.kEnd).map(v=>v.id));
+    return p.filter(x=>ids.has(x.id));
+  }
+  const tg=new Set(dayTags(DAYF.d));
+  return p.filter(x=>x.lv===5&&tg.has(x.tag));
+}
+function pick(mode,n){
+  const pool=poolFor(mode); if(!pool.length)return [];
+  const now=Date.now(), due=[], nw=[], rest=[];
+  pool.forEach(it=>{
+    const r=S.srs[srsKey(mode,it.id)];
+    if(!r)nw.push(it); else if(r.due<=now)due.push(it); else rest.push(it);
+  });
+  const out=shuf(due).slice(0,n);
+  if(out.length<n)out.push(...shuf(nw).slice(0,n-out.length));
+  if(out.length<n)out.push(...shuf(rest).slice(0,n-out.length));
+  return shuf(out);
+}
+
+/* ---------- 出題 ---------- */
+function mkQ(mode,it){
+  if(mode==='vocab'){
+    const pool=allVocab();
+    // 中文欄和日文寫法互相包含的字（山→山、電話→電話…）問意思等於送分，改問讀音
+    const leaky = it.m.includes(it.w)||it.w.includes(it.m);
+    if(leaky && it.w!==it.r){
+      const near=pool.filter(x=>x.r!==it.r&&Math.abs(x.r.length-it.r.length)<=1);
+      const wr=shuf(near.length>=3?near:pool.filter(x=>x.r!==it.r)).slice(0,3);
+      return {mode,it,lab:'這個詞怎麼唸？',main:it.w,sub:it.m,
+        opts:shuf([it,...wr]).map(o=>({t:o.r,s:'',ok:o.r===it.r})),
+        say:it.r,ansTxt:it.r,ansRd:'',ansCn:it.w+'　'+it.m};
+    }
+    const dir=Math.random()<.5?0:1;
+    const wrong=shuf(pool.filter(x=>x.id!==it.id&&x.m!==it.m&&x.w!==it.w)).slice(0,3);
+    if(dir===0) return {mode,it,lab:'這個中文的日文是？',main:it.m,mainSm:true,
+      opts:shuf([it,...wrong]).map(o=>({t:o.w,s:o.r,ok:o.id===it.id})),
+      say:it.r,ansTxt:it.w,ansRd:it.r,ansCn:it.m};
+    return {mode,it,lab:'這個日文是什麼意思？',main:it.w,sub:it.r,
+      opts:shuf([it,...wrong]).map(o=>({t:o.m,s:'',ok:o.id===it.id})),
+      say:it.r,ansTxt:it.m,ansRd:it.r,ansCn:it.w};
+  }
+  if(mode==='kanji'){
+    const pool=poolFor('kanji');
+    const near=pool.filter(x=>x.id!==it.id&&Math.abs(x.r.length-it.r.length)<=1&&x.r!==it.r);
+    const wrong=shuf(near.length>=3?near:pool.filter(x=>x.id!==it.id&&x.r!==it.r)).slice(0,3);
+    return {mode,it,lab:'這個詞怎麼唸？',main:it.w,sub:it.m,
+      opts:shuf([it,...wrong]).map(o=>({t:o.r,s:'',ok:o.r===it.r})),
+      say:it.r,ansTxt:it.r,ansRd:'',ansCn:it.m};
+  }
+  if(mode==='verb'){
+    const avoid = it.d==='死ぬ' ? ['tai','imp','vol'] : [];
+    const f=rnd(window.VERB_FORMS.filter(x=>!avoid.includes(x.k))), right=window.conjV(it,f.k);
+    const seen=new Set([right.k]), uniq=[];
+    shuf(window.VERB_FORMS.filter(x=>x.k!==f.k&&!avoid.includes(x.k))).forEach(x=>{
+      const c=window.conjV(it,x.k); if(!seen.has(c.k)){seen.add(c.k);uniq.push(c)}
+    });
+    const wrong=uniq.slice(0,3);
+    return {mode,it,lab:['','第一類（五段）','第二類（一段）','第三類（不規則）'][it.t],
+      fk:f.k, fn:f.n,
+      main:it.d,sub:it.r+'　'+it.m,hint:'→ 變成 '+f.n+'（'+f.h+'）',
+      opts:shuf([right,...wrong]).map(o=>({t:o.k,s:o.r===o.k?'':o.r,ok:o.k===right.k})),
+      say:right.r,ansTxt:right.k,ansRd:right.r,ansCn:f.n+'　'+it.m};
+  }
+  if(mode==='part'){
+    const idxs=it.ch.map((c,i)=>PARTICLES.includes(c)?i:-1).filter(i=>i>=0);
+    const bi=rnd(idxs), right=it.ch[bi];
+    const shown=it.ch.map((c,i)=>i===bi?'［ ？ ］':c).join('');
+    // へ↔に（方向）、と↔や（列舉）在很多句子裡兩個都通，不能拿來當干擾選項
+    const EXCL={'へ':['に'],'に':['へ'],'と':['や'],'や':['と']};
+    const bad=EXCL[right]||[];
+    const wrong=shuf(PARTICLES.filter(p=>p!==right&&!bad.includes(p))).slice(0,3);
+    return {mode,it,pk:right,lab:'填入正確的助詞',main:shown,mainSm:true,sub:it.c,
+      opts:shuf([right,...wrong]).map(o=>({t:o,s:'',ok:o===right})),
+      say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
+  }
+  if(mode==='build') return {mode,it,build:true,lab:'把日文句子拼出來',main:it.c,mainSm:true,
+      say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
+  if(mode==='shadow') return {mode,it,shadow:true,lab:'聽一次，跟著唸一次',
+      main:it.j, say:it.k, ansTxt:it.j, ansRd:it.k, ansCn:it.c};
+  if(mode==='listen'){
+    const pool=poolFor('listen');
+    const wrong=shuf(pool.filter(x=>x.id!==it.id&&x.c!==it.c)).slice(0,3);
+    return {mode,it,listen:true,lab:'聽聽看，這句話是什麼意思？',main:'🎧',
+      opts:shuf([it,...wrong]).map(o=>({t:o.c,s:'',ok:o.id===it.id})),
+      say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
+  }
+}
+
+/* ---------- 練習流程 ---------- */
+let Q=[],qi=0,answered=false,cur=null,slot=[];
+function courseDone(){
+  return (S.course.phase||'n5')==='n4'
+    ? Object.keys(S.course.done2||{}).length>=14
+    : Object.keys(S.course.done||{}).length>=14 && (S.course.phase||'n5')==='n5' && false;
+}
+function startAuto(){
+  const q=[];
+  const u=curUnit();
+  const useCourse = (S.course.phase||'n5')==='n4'
+    ? Object.keys(S.course.done2||{}).length<14
+    : Object.keys(S.course.done||{}).length<14;
+  if(useCourse)setScope(u);
+  MODES.forEach(m=>{
+    const need=Math.max(0,(S.goals[m.k]||0)-doneToday(m.k));
+    if(need>0)pick(m.k,Math.min(need,12)).forEach(it=>q.push({mode:m.k,it}));
+  });
+  if(!q.length){ MODES.forEach(m=>pick(m.k,2).forEach(it=>q.push({mode:m.k,it}))); toast('今天目標都完成了，這是加練'); }
+  DAYF=null; WEEKF=null;
+  runQueue(shuf(q).slice(0,40));
+}
+function startMode(m){
+  if(m==='wrong'){
+    const q=Object.values(S.wrong).map(w=>{
+      const it=poolFor(w.mode).find(x=>x.id===w.id); return it?{mode:w.mode,it}:null;}).filter(Boolean);
+    if(!q.length)return toast('錯題本是空的');
+    return runQueue(shuf(q).slice(0,25));
+  }
+  const need=Math.max(1,(S.goals[m]||0)-doneToday(m));
+  const q=pick(m,Math.max(need,10)).map(it=>({mode:m,it}));
+  if(!q.length)return toast('這個模式沒有題目');
+  runQueue(q);
+}
+function runQueue(q){
+  Q=q;qi=0;
+  ['homeCard','courseCard','kanaCard','wrongCard','dueCard','extraCard'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.add('hide')});
+  document.getElementById('pracArea').classList.remove('hide');
+  showQ(); window.scrollTo(0,0);
+}
+function showHome(){
+  ['homeCard','courseCard','kanaCard','extraCard'].forEach(i=>{
+    const e=document.getElementById(i); if(e)e.classList.remove('hide');
+  });
+}
+function quitPrac(){
+  DAYF=null; WEEKF=null;
+  document.getElementById('pracArea').classList.add('hide');
+  showHome();
+  try{speechSynthesis.cancel()}catch(e){}
+  renderAll(); syncNow(true);
+}
+function prevQ(){ if(qi>0){qi--;showQ()} }
+function nextQ(){ qi++; showQ(); }
+
+function showQ(){
+  const box=document.getElementById('qBox');
+  if(qi>=Q.length){
+    box.innerHTML=`<div class="q"><div class="qmain">🎉</div>
+      <div class="qsub" style="margin-top:14px">這一輪 ${Q.length} 題做完了</div></div>
+      <div class="row"><button class="p" onclick="startAuto()">再來一輪</button>
+      <button class="g" onclick="quitPrac()">回首頁</button></div>`;
+    document.getElementById('pracInfo').textContent='';
+    if(DAYF){ S.course.done[DAYF.d]=true; if(DAYF.d<14)S.course.cur=DAYF.d+1; }
+    if(WEEKF){ S.course.done2=S.course.done2||{}; S.course.done2[WEEKF.w]=true; if(WEEKF.w<14)S.course.cur2=WEEKF.w+1; }
+    save(); syncNow(true); return;
+  }
+  const {mode,it}=Q[qi];
+  cur=mkQ(mode,it); answered=false; slot=[];
+  const M=MODES.find(m=>m.k===mode);
+  document.getElementById('pracInfo').textContent=`${M.i} ${M.n}　${qi+1} / ${Q.length}`;
+  document.getElementById('btnPrev').disabled=qi===0;
+  paint();
+  if(mode==='listen')setTimeout(()=>speak(cur.say),320);
+}
+
+function paint(){
+  const c=cur, box=document.getElementById('qBox');
+  let h=`<div class="q">
+    <div class="qlab">${esc(c.lab)}</div>
+    <div class="qmain ${c.mainSm?'sm':''} jp">${esc(c.main)}</div>
+    ${c.sub?`<div class="qsub jp">${esc(c.sub)}</div>`:''}
+    ${c.hint?`<div class="qhint">${esc(c.hint)}</div>`:''}
+  </div>`;
+
+  if(c.listen){
+    h+=`<div class="row"><button onclick="speak(cur.say)">🔊 再聽一次</button>
+      <button class="g" onclick="speakSlow()">🐢 放慢</button></div>`;
+  }
+  if(c.shadow){
+    box.innerHTML=`<div class="q shad">
+        <div class="qlab">${esc(c.lab)}</div>
+        <div class="sj jp">${esc(c.it.j)}</div>
+        <div class="sk jp">${esc(c.it.k)}</div>
+        <div class="sc">${esc(c.it.c)}</div>
+        <div class="dots" id="dots"></div>
+        <div class="mic" id="micOut"></div>
+      </div>
+      <div class="row">
+        <button class="p" onclick="shadPlay()" id="shadBtn">🔊 播放並跟讀（0/5）</button>
+      </div>
+      <div class="row">
+        <button class="g" onclick="shadSlow()">🐢 放慢一次</button>
+        ${('webkitSpeechRecognition' in window||'SpeechRecognition' in window)?'<button class="g" onclick="shadMic()" id="micBtn">🎤 錄一次看看</button>':''}
+        <button class="g" onclick="shadSkip()">跳過</button>
+      </div>
+      <div id="resBox"></div>`;
+    shadN=0; shadDots();
+    return;
+  }
+  if(c.build){
+    h+=`<div class="slot" id="slot"></div>
+        <div class="pool" id="pool"></div>
+        <div class="row"><button class="g" onclick="undoChip()">↩ 退一格</button>
+        <button class="p" onclick="checkBuild()">確認</button></div>`;
+  }else{
+    h+=`<div class="opts" id="opts">`+c.opts.map((o,i)=>
+      `<div class="opt jp" data-i="${i}" onclick="answer(${i})">${esc(o.t)}${o.s?`<small class="jp">${esc(o.s)}</small>`:''}</div>`).join('')+`</div>`;
+  }
+  h+=`<div id="resBox"></div>`;
+  box.innerHTML=h;
+  if(c.build)paintBuild();
+}
+function speakSlow(){const r=S.rate;S.rate=Math.max(.5,r-.3);speak(cur.say);S.rate=r}
+
+/* 組句 */
+function paintBuild(){
+  const c=cur;
+  if(!c._pool)c._pool=shuf(c.it.ch.map((t,i)=>({t,i})));
+  document.getElementById('slot').innerHTML=slot.map((s,n)=>
+    `<span class="chip jp" onclick="undoChip(${n})">${esc(s.t)}</span>`).join('');
+  document.getElementById('pool').innerHTML=c._pool.map((p,n)=>
+    `<span class="chip jp ${slot.some(s=>s.n===n)?'used':''}" onclick="addChip(${n})">${esc(p.t)}</span>`).join('');
+}
+function addChip(n){ if(answered)return; if(slot.some(s=>s.n===n))return;
+  slot.push({n,t:cur._pool[n].t}); paintBuild(); }
+function undoChip(n){ if(answered)return; if(n==null)slot.pop(); else slot.splice(n,1); paintBuild(); }
+function checkBuild(){
+  if(answered)return;
+  const got=slot.map(s=>s.t).join('');
+  const ok=got===cur.it.j;
+  document.getElementById('slot').classList.add(ok?'right':'wrong');
+  finish(ok);
+}
+
+/* 選擇題 */
+function answer(i){
+  if(answered)return;
+  const ok=cur.opts[i].ok;
+  document.querySelectorAll('#opts .opt').forEach((el,n)=>{
+    if(cur.opts[n].ok)el.classList.add('right');
+    else if(n===i)el.classList.add('wrong');
+    else el.classList.add('dim');
+  });
+  finish(ok);
+}
+
+function bump(bucket,key,ok){
+  if(!key)return;
+  const b=S.stat[bucket]=S.stat[bucket]||{};
+  const r=b[key]=b[key]||{ok:0,ng:0};
+  ok?r.ok++:r.ng++;
+}
+function finish(ok){
+  answered=true;
+  srsHit(cur.mode,cur.it.id,ok);
+  bump('mode',cur.mode,ok);
+  if(cur.mode==='verb')bump('form',cur.fk,ok);
+  if(cur.mode==='part')bump('part',cur.pk,ok);
+  save();
+  const c=cur;
+  const rb=document.getElementById('resBox');
+  rb.innerHTML=`<div class="res" style="border-color:${ok?'rgba(62,207,142,.45)':'rgba(224,90,90,.45)'}">
+      <div class="rt" style="color:${ok?'var(--ok)':'var(--acc)'}">${ok?'答對了':'答錯了，收進錯題本'}</div>
+      <div class="ans jp">${esc(c.ansTxt)}</div>
+      ${c.ansRd?`<div class="rd jp">${esc(c.ansRd)}</div>`:''}
+      ${c.ansCn?`<div class="rc">${esc(c.ansCn)}</div>`:''}
+    </div>
+    <div class="row">
+      <button class="g" onclick="speak(cur.say)">🔊 唸一次</button>
+      ${hasAI()?`<button class="g" onclick="aiExplain()">✨ AI 拆解</button>`:''}
+      <button class="p" onclick="nextQ()">下一題 →</button>
+    </div>
+    <div id="aiExp"></div>`;
+  if(!ok)speak(c.say);
+  const M=MODES.find(m=>m.k===c.mode);
+  if(doneToday(c.mode)===(S.goals[c.mode]||0)&&S.goals[c.mode]>0)toast(M.i+' '+M.n+' 今天達標了');
+}
+
+async function aiExplain(){
+  const box=document.getElementById('aiExp');
+  box.innerHTML='<div class="tiny" style="margin-top:9px">AI 分析中…</div>';
+  const c=cur;
+  const q=`你是教台灣人日文的老師。學生正在練「${MODES.find(m=>m.k===c.mode).n}」，題目答案是：
+日文：${c.ansTxt}
+讀音：${c.ansRd||'（無）'}
+中文：${c.ansCn}
+請用繁體中文，在 150 字內說明三件事：(1) 這句/這個詞的結構怎麼拆 (2) 台灣人最容易在這裡犯什麼錯 (3) 一個延伸例句（附中譯）。不要用 markdown 標題，直接寫。`;
+  try{ const t=await askAI(q,'',600);
+    box.innerHTML=`<div class="res" style="margin-top:9px"><div class="rc" style="color:var(--tx);white-space:pre-wrap">${esc(t)}</div></div>`;
+  }catch(e){ box.innerHTML='<div class="tiny" style="color:var(--acc);margin-top:9px">AI 失敗：'+esc(e.message)+'</div>'; }
+}
+
+/* ======================================================================
+   畫面渲染
+   ====================================================================== */
+function go(s){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  document.querySelectorAll('main section').forEach(x=>x.classList.toggle('on',x.id==='s-'+s));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
+
+function renderGoals(){
+  const g=document.getElementById('goalGrid');
+  let done=0,tot=0;
+  g.innerHTML=MODES.map(m=>{
+    const goal=S.goals[m.k]||0, did=doneToday(m.k);
+    if(goal>0){tot++; if(did>=goal)done++;}
+    const pct=goal?Math.min(100,did/goal*100):0;
+    return `<div class="goal ${goal&&did>=goal?'done':''}" onclick="startMode('${m.k}')">
+      <div class="gn">${m.i} ${m.n}</div>
+      <div class="gv">${did}<span style="color:var(--tx3);font-size:12px">/${goal}</span></div>
+      <div class="gb"><i style="width:${pct}%"></i></div></div>`;
+  }).join('');
+  document.getElementById('goalAll').textContent=`${done} / ${tot} 項達標`;
+  const sb=document.getElementById('startBtn');
+  if(sb){
+    const u=curUnit();
+    const fin=(S.course.phase||'n5')==='n4'
+      ? Object.keys(S.course.done2||{}).length>=14
+      : Object.keys(S.course.done||{}).length>=14;
+    sb.innerHTML=fin?'▶ 開始練習<br><span class="tiny">全題庫範圍</span>'
+      :`▶ 開始練習<br><span class="tiny">${u.label} 的範圍</span>`;
+  }
+}
+function renderGoalSet(){
+  document.getElementById('goalSet').innerHTML=MODES.map(m=>
+    `<label>${m.i} ${m.n} — <span style="color:var(--tx3)">${m.d}</span></label>
+     <input type="number" min="0" max="60" value="${S.goals[m.k]||0}" onchange="S.goals['${m.k}']=+this.value||0;save();renderGoals()">`).join('');
+}
+function renderStats(){
+  const nw=Object.keys(S.wrong).length, du=dueCount();
+  document.getElementById('stStreak').textContent=S.streak+' 天';
+  document.getElementById('stTotal').textContent=S.total;
+  document.getElementById('stSeen').textContent=Object.keys(S.srs).length;
+  document.getElementById('stMature').textContent=Object.values(S.srs).filter(r=>r.n>=3).length;
+  document.getElementById('stWrong').textContent=nw;
+  document.getElementById('stDue').textContent=du;
+  document.getElementById('hStreak').textContent='連續 '+S.streak+' 天';
+  document.getElementById('hCount').textContent='累計 '+S.total+' 題';
+  const wc=document.getElementById('wrongCard');
+  wc.classList.toggle('hide',nw===0);
+  document.getElementById('wrongN').textContent=nw+' 題';
+  const dc=document.getElementById('dueCard');
+  dc.classList.toggle('hide',du===0);
+  document.getElementById('dueN').textContent=du+' 項';
+}
+function renderReports(){
+  const el=document.getElementById('reportList');
+  if(!S.reports.length)return void(el.innerHTML='<div class="tiny">還沒有報告。用 AI 聊天後按「產生檢討報告」就會出現。</div>');
+  el.innerHTML=S.reports.map((r,i)=>
+    `<details><summary>${new Date(r.t).toLocaleDateString()} ${esc(r.title||'檢討報告')}</summary>
+     <div class="rc" style="white-space:pre-wrap;font-size:13.5px;color:var(--tx)">${esc(r.body)}</div></details>`).join('');
+}
+function renderAll(){
+  renderGoals();renderStats();renderGoalSet();renderReports();renderBank();renderCourse();renderCourseCard();renderHeaderSub();kanaBtns();renderExtra();renderWeak();renderCorrect();
+  bkDot();syncDot();refreshAI();
+  document.getElementById('verTxt').textContent=APPVER;
+  document.getElementById('cntVocab').textContent=allVocab().length+' 字';
+  document.getElementById('cntVerb').textContent=VERBS.length+' 個（'+(VERBS.length*window.VERB_FORMS.length)+' 種變化）';
+  document.getElementById('cntGram').textContent=GRAM.length+' 條';
+  document.getElementById('cntSent').textContent=allSent().length+' 句';
+  document.getElementById('sqlText').textContent=SQL;
+  document.getElementById('rate').value=S.rate;
+  document.getElementById('rateV').textContent=(+S.rate).toFixed(1);
+  document.getElementById('prov').value=S.prov;
+  document.getElementById('apikey').value=aiKey();
+  document.getElementById('model').value=aiModel();
+  fillSupa();
+}
+
+/* ---------- 題庫瀏覽 ---------- */
+let BT='vocab';
+function bankTab(t){BT=t;renderBank();
+  document.querySelectorAll('#bankTabs button').forEach(b=>b.classList.toggle('p',b.dataset.t===t))}
+function renderBank(){
+  const tabs=[['vocab','單字'],['verb','動詞'],['pair','自他'],['gram','文法'],['sent','句子'],['wrong','錯題']];
+  const tb=document.getElementById('bankTabs');
+  if(tb.children.length!==tabs.length)
+    tb.innerHTML=tabs.map(([k,n])=>`<button data-t="${k}" class="${k===BT?'p':''}" onclick="bankTab('${k}')">${n}</button>`).join('');
+  const q=(document.getElementById('bankSearch').value||'').trim().toLowerCase();
+  const hit=s=>!q||String(s).toLowerCase().includes(q);
+  let rows=[],n=0;
+  if(BT==='vocab'){
+    const a=allVocab().filter(v=>hit(v.w)||hit(v.r)||hit(v.m));n=a.length;
+    rows=a.slice(0,300).map(v=>`<div class="li"><div class="lw jp" onclick="speak('${esc(v.r)}')">${esc(v.w)}<span class="lr jp">${esc(v.r)}</span></div>
+      <div class="lm">${esc(v.m)}<div class="ls">${esc(v.p)}・N${v.lv}</div></div></div>`);
+  }else if(BT==='verb'){
+    const a=VERBS.filter(v=>hit(v.d)||hit(v.r)||hit(v.m));n=a.length;
+    rows=a.slice(0,300).map(v=>`<div class="li"><div class="lw jp" onclick="speak('${esc(v.r)}')">${esc(v.d)}<span class="lr jp">${esc(v.r)}</span></div>
+      <div class="lm">${esc(v.m)}<div class="ls">${['','五段','一段','不規則'][v.t]}・N${v.lv}　${esc(window.conjV(v,'masu').k)}／${esc(window.conjV(v,'te').k)}／${esc(window.conjV(v,'nai').k)}</div></div></div>`);
+  }else if(BT==='pair'){
+    const a=PAIRS.filter(p=>hit(p.a)||hit(p.b)||hit(p.m));n=a.length;
+    rows=a.map(p=>`<div class="li"><div class="lw jp">${esc(p.a)}<span class="lr jp">${esc(p.ar)}</span></div>
+      <div class="lm"><span class="jp" style="font-size:16px">${esc(p.b)}</span> <span class="ls jp">${esc(p.br)}</span>
+      <div class="ls">${esc(p.m)}（左＝自動詞　右＝他動詞）</div></div></div>`);
+  }else if(BT==='gram'){
+    const a=GRAM.filter(g=>hit(g.p)||hit(g.m)||hit(g.e)||hit(g.et));n=a.length;
+    rows=a.map(g=>`<div class="li" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px">
+      <b class="jp" style="font-size:16px">${esc(g.p)}</b><span class="pill ${g.lv===5?'ok':'w'}">N${g.lv}</span></div>
+      <div class="ls">${esc(g.m)}　｜　接續：${esc(g.c)}</div>
+      <div class="jp" style="margin-top:5px;font-size:15px" onclick="speak('${esc(g.ek)}')">${esc(g.e)}</div>
+      <div class="ls">${esc(g.et)}</div></div>`);
+  }else if(BT==='sent'){
+    const a=allSent().filter(s=>hit(s.j)||hit(s.k)||hit(s.c)||hit(s.tag));n=a.length;
+    rows=a.slice(0,300).map(s=>`<div class="li" style="display:block" onclick="speak('${esc(s.k)}')">
+      <div class="jp" style="font-size:16px">${esc(s.j)}</div>
+      <div class="ls jp" style="color:var(--acc2)">${esc(s.k)}</div>
+      <div class="ls">${esc(s.c)}　·　${esc(s.tag)}　·　N${s.lv}</div></div>`);
+  }else{
+    const a=Object.entries(S.wrong);n=a.length;
+    rows=a.map(([k,w])=>{
+      const it=poolFor(w.mode).find(x=>x.id===w.id); if(!it)return '';
+      const label=it.w||it.d||it.j;
+      return `<div class="li"><div class="lw jp">${esc(label)}</div>
+        <div class="lm">${esc(it.m||it.c||'')}<div class="ls">${MODES.find(m=>m.k===w.mode).n}</div></div>
+        <button class="sm g" onclick="delWrong('${k}')">移除</button></div>`;
+    });
+    if(!n)rows=['<div class="tiny">錯題本是空的。</div>'];
+  }
+  document.getElementById('bankList').innerHTML=rows.join('')||'<div class="tiny">沒有符合的結果。</div>';
+  document.getElementById('bankCount').textContent=`共 ${n} 筆${n>300?'（只顯示前 300 筆，請用搜尋縮小範圍）':''}`;
+}
+function delWrong(k){delete S.wrong[k];save();renderAll();}
+
+function addCustom(t){
+  if(t==='vocab'){
+    const w=prompt('日文（漢字表記）');if(!w)return;
+    const r=prompt('讀音（平假名）');if(!r)return;
+    const m=prompt('中文意思');if(!m)return;
+    S.custom.vocab.push({w,r,m,p:'名',lv:5});
+  }else{
+    const j=prompt('日文句子，詞塊用 / 分開\n例：私 / は / 学生 / です。');if(!j)return;
+    const k=prompt('全假名讀音');if(!k)return;
+    const c=prompt('中文意思');if(!c)return;
+    S.custom.sent.push({j,k,c,lv:5});
+  }
+  save();renderAll();toast('已加入，會跟著雲端同步');
+}
+async function aiGenBank(){
+  if(!hasAI())return toast('要先設定 AI 金鑰');
+  const topic=prompt('想產生什麼主題的句子？例：在日本看醫生');if(!topic)return;
+  toast('AI 生成中…');
+  try{
+    const t=await askAI(`請產生 8 個日文句子，主題是「${topic}」，難度 N5～N4。
+只回傳 JSON 陣列，每個元素是 {"j":"日文句子（詞塊之間用 / 分開，助詞要獨立成一塊）","k":"全部平假名讀音","c":"繁體中文翻譯"}。
+範例：{"j":"薬 / を / 飲んで / ください。","k":"くすりをのんでください。","c":"請吃藥。"}
+不要任何說明文字。`,'',1600);
+    const arr=digJSON(t);
+    if(!Array.isArray(arr)||!arr.length)throw new Error('格式解析失敗');
+    arr.forEach(o=>{if(o.j&&o.k&&o.c)S.custom.sent.push({j:o.j,k:o.k,c:o.c,lv:4})});
+    save();renderAll();toast('加了 '+arr.length+' 句到題庫');
+  }catch(e){toast('失敗：'+e.message)}
+}
+
+/* ======================================================================
+   Extra 加練 ／ 定期複習 ／ 弱點特訓
+   ====================================================================== */
+function curUnit(){
+  const ph=S.course.phase||'n5';
+  return ph==='n4'
+    ? {ph, n:Math.min(S.course.cur2||1,14), label:'Week '+Math.min(S.course.cur2||1,14), obj:COURSE2[Math.min(S.course.cur2||1,14)-1]}
+    : {ph, n:Math.min(S.course.cur||1,14),  label:'Day '+Math.min(S.course.cur||1,14),  obj:COURSE[Math.min(S.course.cur||1,14)-1]};
+}
+function setScope(u){ if(u.ph==='n4'){WEEKF=u.obj;DAYF=null}else{DAYF=u.obj;WEEKF=null} }
+
+/* 加練：同一單元範圍，多來 n 題（不影響課表完成狀態） */
+function startExtra(n){
+  const u=curUnit(); setScope(u);
+  const per=Math.max(2,Math.round(n/MODES.length));
+  const q=[]; MODES.forEach(m=>pick(m.k,per).forEach(it=>q.push({mode:m.k,it})));
+  DAYF=null; WEEKF=null;                     // 出完題就解除，避免被記成完成整個單元
+  if(!q.length)return toast('這個範圍沒有題目');
+  const d=today(); S.extra[d]=(S.extra[d]||0)+q.length; save();
+  go('prac'); runQueue(shuf(q).slice(0,n));
+}
+/* 全範圍挑戰 */
+function startAll(n){
+  DAYF=null; WEEKF=null;
+  const per=Math.max(2,Math.round(n/MODES.length));
+  const q=[]; MODES.forEach(m=>pick(m.k,per).forEach(it=>q.push({mode:m.k,it})));
+  if(!q.length)return toast('沒有題目');
+  const d=today(); S.extra[d]=(S.extra[d]||0)+q.length; save();
+  go('prac'); runQueue(shuf(q).slice(0,n));
+}
+/* 提前解鎖下一單元 */
+function unlockNext(){
+  const ph=S.course.phase||'n5';
+  if(ph==='n4'){
+    const w=(S.course.cur2||1); if(w>=14)return toast('N4 課表已經到最後一週了');
+    S.course.cur2=w+1; save(); renderAll(); go('course'); openWeek(w+1);
+  }else{
+    const d=(S.course.cur||1);
+    if(d>=14){ S.course.phase='n4'; save(); renderAll(); go('course'); toast('N5 走完了，幫你切到 N4 課表'); return openWeek(S.course.cur2||1); }
+    S.course.cur=d+1; save(); renderAll(); go('course'); openDay(d+1);
+  }
+}
+/* 定期複習：只做「到期」的項目 */
+function startDue(){
+  DAYF=null; WEEKF=null;
+  const now=Date.now(), q=[];
+  MODES.forEach(m=>{
+    poolRaw(m.k).forEach(it=>{
+      const r=S.srs[srsKey(m.k,it.id)];
+      if(r&&r.due&&r.due<=now)q.push({mode:m.k,it});
+    });
+  });
+  if(!q.length)return toast('今天沒有到期的項目，去做加練吧');
+  go('prac'); runQueue(shuf(q).slice(0,40));
+}
+/* 弱點特訓：專挑錯最多、正確率最低的 */
+function weakList(limit){
+  const out=[];
+  Object.entries(S.srs).forEach(([k,r])=>{
+    const ng=r.ng||0, ok=r.ok||0;
+    if(!ng)return;
+    const [mode,id]=[k.slice(0,k.indexOf(':')),k.slice(k.indexOf(':')+1)];
+    if(!MODES.find(m=>m.k===mode))return;
+    const it=poolRaw(mode).find(x=>x.id===id); if(!it)return;
+    out.push({mode,it,ng,ok,rate:ok+ng?Math.round(ok/(ok+ng)*100):0});
+  });
+  out.sort((a,b)=>(b.ng-a.ng)||(a.rate-b.rate));
+  return limit?out.slice(0,limit):out;
+}
+function startWeak(n){
+  DAYF=null; WEEKF=null;
+  const w=weakList(n);
+  if(!w.length)return toast('還沒有累積到弱點資料，先多練幾輪');
+  const d=today(); S.extra[d]=(S.extra[d]||0)+w.length; save();
+  go('prac'); runQueue(shuf(w.map(x=>({mode:x.mode,it:x.it}))));
+}
+
+/* ---------- 弱點報告 ---------- */
+function rateOf(r){const t=(r.ok||0)+(r.ng||0);return t?Math.round(r.ok/t*100):null}
+function barRow(name,r){
+  const p=rateOf(r); const t=(r.ok||0)+(r.ng||0);
+  const col=p===null?'var(--line)':p>=85?'var(--ok)':p>=65?'var(--warn)':'var(--acc)';
+  return `<div class="wbar"><span class="wn">${esc(name)}</span>
+    <span class="wt"><i style="width:${p===null?0:p}%;background:${col}"></i></span>
+    <span class="wv">${p===null?'—':p+'%'}<span style="color:var(--tx3);font-size:11px"> ／${t}</span></span></div>`;
+}
+function renderWeak(){
+  const box=document.getElementById('weakBox'); if(!box)return;
+  const st=S.stat||{mode:{},form:{},part:{}};
+  const totalAns=Object.values(st.mode||{}).reduce((s,r)=>s+(r.ok||0)+(r.ng||0),0);
+  if(totalAns<20){
+    box.innerHTML='<div class="muted">練滿 20 題以後這裡就會開始顯示分析。目前 '+totalAns+' 題。</div>';
+    return;
+  }
+  let h='<h3>各模式正確率</h3>';
+  MODES.forEach(m=>{ h+=barRow(m.i+' '+m.n, st.mode[m.k]||{ok:0,ng:0}); });
+
+  const forms=Object.entries(st.form||{}).map(([k,r])=>({k,r,p:rateOf(r),t:(r.ok||0)+(r.ng||0)}))
+    .filter(x=>x.t>=3&&x.p!==null).sort((a,b)=>a.p-b.p).slice(0,4);
+  if(forms.length){
+    h+='<h3>動詞變化：最弱的幾種</h3>';
+    forms.forEach(x=>{ const F=window.VERB_FORMS.find(f=>f.k===x.k); h+=barRow(F?F.n:x.k,x.r); });
+  }
+  const parts=Object.entries(st.part||{}).map(([k,r])=>({k,r,p:rateOf(r),t:(r.ok||0)+(r.ng||0)}))
+    .filter(x=>x.t>=3&&x.p!==null).sort((a,b)=>a.p-b.p).slice(0,4);
+  if(parts.length){
+    h+='<h3>助詞：最弱的幾個</h3>';
+    parts.forEach(x=>h+=barRow(x.k,x.r));
+  }
+  const w=weakList(10);
+  if(w.length){
+    h+='<h3>最常錯的項目</h3>';
+    h+=w.map(x=>{
+      const label=x.it.w||x.it.d||x.it.j||'';
+      const sub=x.it.m||x.it.c||'';
+      return `<div class="li"><div class="lw jp" style="min-width:0;flex:1">${esc(label)}
+        <span class="ls" style="display:block;font-weight:400">${esc(sub)}</span></div>
+        <div style="text-align:right"><span class="pill acc">錯 ${x.ng} 次</span>
+        <div class="ls">${MODES.find(m=>m.k===x.mode).n}</div></div></div>`;
+    }).join('');
+  }
+  const worst=MODES.map(m=>({m,p:rateOf(st.mode[m.k]||{})})).filter(x=>x.p!==null).sort((a,b)=>a.p-b.p)[0];
+  if(worst)h+=`<div class="tiny" style="margin-top:12px">💡 目前最弱的是「${worst.m.n}」（${worst.p}%）。可以在「我的 → 每日目標」把它的題數調高幾題。</div>`;
+  box.innerHTML=h;
+}
+
+/* ---------- 跟讀 ---------- */
+let shadN=0;
+function shadDots(){
+  const el=document.getElementById('dots'); if(!el)return;
+  el.innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<shadN?'on':''}"></i>`).join('');
+  const b=document.getElementById('shadBtn');
+  if(b)b.textContent=shadN>=5?'✓ 這句完成了':`🔊 播放並跟讀（${shadN}/5）`;
+}
+function shadPlay(){
+  if(answered)return;
+  speak(cur.say,()=>{});
+  shadN++; shadDots();
+  if(shadN>=5){ finish(true); }
+}
+function shadSlow(){ if(answered)return; const r=S.rate; S.rate=Math.max(.5,r-.3); speak(cur.say); S.rate=r; }
+function shadSkip(){ if(answered)return; finish(false); }
+function norm(s){return (s||'').replace(/[、。！？「」・\s]/g,'')}
+function simil(a,b){
+  a=norm(a); b=norm(b); if(!a||!b)return 0;
+  const m=Array.from({length:a.length+1},()=>new Array(b.length+1).fill(0));
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+    m[i][j]=a[i-1]===b[j-1]?m[i-1][j-1]+1:Math.max(m[i-1][j],m[i][j-1]);
+  return Math.round(m[a.length][b.length]/Math.max(a.length,b.length)*100);
+}
+function shadMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return toast('這台裝置不支援語音辨識');
+  const out=document.getElementById('micOut');
+  const r=new SR(); r.lang='ja-JP'; r.interimResults=false; r.maxAlternatives=3;
+  out.textContent='🎤 聽你唸…';
+  r.onresult=e=>{
+    const alts=[...e.results[0]].map(x=>x.transcript);
+    const best=Math.max(...alts.map(t=>Math.max(simil(t,cur.it.j),simil(t,cur.it.k))));
+    out.innerHTML=`辨識到：<b class="jp">${esc(alts[0])}</b>　相似度 <b style="color:${best>=70?'var(--ok)':best>=45?'var(--warn)':'var(--acc)'}">${best}%</b>`
+      +(best>=70?'　很好':best>=45?'　再唸慢一點':'　再聽一次原音');
+  };
+  r.onerror=e=>{out.textContent='辨識失敗（'+e.error+'），用計數的就好';};
+  r.onend=()=>{ if(out.textContent==='🎤 聽你唸…')out.textContent='沒聽到聲音'; };
+  try{r.start()}catch(e){out.textContent='麥克風打不開'}
+}
+
+/* ======================================================================
+   50 音速度測驗
+   ====================================================================== */
+let KQ=[],ki=0,kt0=0,kres=[],kMode='h',kScope='basic';
+function kanaSet(m){kMode=m;S.kana=S.kana||{};S.kana.mode=m;save();kanaBtns()}
+function kanaScope(s){kScope=s;S.kana=S.kana||{};S.kana.scope=s;save();kanaBtns()}
+function kanaBtns(){
+  ['h','k','m'].forEach(x=>{const b=document.getElementById('kb-'+x);if(b)b.className='sm '+(kMode===x?'p':'g')});
+  ['basic','all'].forEach(x=>{const b=document.getElementById('ks-'+x);if(b)b.className='sm '+(kScope===x?'p':'g')});
+  const el=document.getElementById('kanaBest');
+  if(el)el.textContent=(S.kana&&S.kana.best)?('最佳 '+S.kana.best+' 毫秒／字'):'還沒測過';
+}
+function kanaPool(){ return kScope==='basic'?KANA.filter(k=>k.g==='清音'):KANA; }
+function kanaStart(){
+  const pool=kanaPool();
+  KQ=shuf(pool).slice(0,40); ki=0; kres=[];
+  ['homeCard','courseCard','kanaCard','wrongCard','dueCard','extraCard'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.add('hide')});
+  document.getElementById('pracArea').classList.remove('hide');
+  document.getElementById('btnPrev').disabled=true;
+  kanaQ(); window.scrollTo(0,0);
+}
+function kanaQ(){
+  const box=document.getElementById('qBox');
+  if(ki>=KQ.length)return kanaDone();
+  const k=KQ[ki];
+  const show = kMode==='h'?k.h : kMode==='k'?k.k : (Math.random()<.5?k.h:k.k);
+  const wrong=shuf(kanaPool().filter(x=>x.r!==k.r)).slice(0,3);
+  const opts=shuf([k,...wrong]);
+  document.getElementById('pracInfo').textContent=`⚡ 50 音　${ki+1} / ${KQ.length}`;
+  box.innerHTML=`<div class="q"><div class="qlab">這個假名的拼音是？</div>
+      <div class="qmain jp" style="font-size:64px">${esc(show)}</div></div>
+    <div class="opts">${opts.map((o,i)=>
+      `<div class="opt" onclick="kanaAns('${o.r}','${k.r}','${esc(show)}')">${esc(o.r)}</div>`).join('')}</div>`;
+  kt0=performance.now();
+}
+function kanaAns(pick,right,shown){
+  const ms=Math.round(performance.now()-kt0);
+  kres.push({shown,right,ok:pick===right,ms});
+  ki++; kanaQ();
+}
+function kanaDone(){
+  const ok=kres.filter(r=>r.ok).length;
+  const avg=Math.round(kres.reduce((s,r)=>s+r.ms,0)/kres.length);
+  const slow=kres.slice().sort((a,b)=>b.ms-a.ms).slice(0,5);
+  S.kana=S.kana||{};
+  if(!S.kana.best||avg<S.kana.best)S.kana.best=avg;
+  S.kana.last={t:Date.now(),avg,ok,n:kres.length};
+  save();
+  const grade = avg<900?['🚀 非常好','var(--ok)'] : avg<1400?['👍 及格，但還能更快','var(--warn)'] : ['🐢 太慢了，聽力會跟不上','var(--acc)'];
+  document.getElementById('pracInfo').textContent='';
+  document.getElementById('qBox').innerHTML=`
+    <div class="q"><div class="qlab">測驗結果</div>
+      <div class="qmain" style="font-size:44px">${avg}<span style="font-size:18px;color:var(--tx2)"> 毫秒／字</span></div>
+      <div class="qsub" style="color:${grade[1]};font-weight:700;margin-top:10px">${grade[0]}</div>
+      <div class="qsub">正確 ${ok} / ${kres.length}　·　最佳紀錄 ${S.kana.best} 毫秒</div>
+    </div>
+    <div class="card"><h2>拖累你的五個</h2>
+      ${slow.map(r=>`<div class="kres"><span class="jp" style="font-size:20px">${esc(r.shown)}　<span style="font-size:13px;color:var(--tx2)">${esc(r.right)}</span></span>
+        <span style="color:${r.ok?'var(--tx2)':'var(--acc)'}">${r.ms} ms${r.ok?'':'　答錯'}</span></div>`).join('')}
+      <div class="tiny" style="margin-top:10px">目標是平均 900 毫秒以下。超過 1400 毫秒的話，N5 聽力會來不及反應，先每天測一次把它壓下來。</div>
+    </div>
+    <div class="row"><button class="p" onclick="kanaStart()">再測一次</button>
+      <button class="g" onclick="quitPrac()">回首頁</button></div>`;
+}
+
+/* ======================================================================
+   課表（N5 14 天 ／ N4 14 週）
+   ====================================================================== */
+function examDays(){
+  const e=new Date(2026,11,6), d=Math.ceil((e-new Date())/864e5);
+  return d;
+}
+function renderHeaderSub(){
+  const d=examDays();
+  document.getElementById('hSub').textContent = d>0
+    ? `距 12/6 N4 考試 ${d} 天` : '日文 N5 → N1 每日訓練';
+}
+function renderExtra(){
+  const u=curUnit(), d=today();
+  const el=document.getElementById('extraPill'); if(!el)return;
+  el.textContent='今天已加練 '+(S.extra[d]||0)+' 題';
+  document.getElementById('extraNote').textContent=
+    `「加練」用的是 ${u.label} 的範圍；「提前上下一單元」會直接把課表推到下一單元，適合你今天特別有空的時候。`;
+  const bn=document.getElementById('btnNext');
+  if(bn)bn.textContent=(S.course.phase||'n5')==='n4'
+    ? '提前上 Week '+Math.min((S.course.cur2||1)+1,14)
+    : ((S.course.cur||1)>=14?'切到 N4 課表':'提前上 Day '+((S.course.cur||1)+1));
+}
+function renderCourseCard(){
+  if((S.course.phase||'n5')==='n4'){
+    const w=S.course.cur2||1, dn=Object.keys(S.course.done2||{}).length, c2=COURSE2[Math.min(w,14)-1];
+    document.getElementById('ccTitle').textContent=`Week ${w}　${c2.t}`;
+    document.getElementById('ccPill').textContent=dn+' / 14 週';
+    document.getElementById('ccDesc').textContent=c2.why;
+    return;
+  }
+  const cur=S.course.cur||1, done=Object.keys(S.course.done||{}).length;
+  const c=COURSE[Math.min(cur,14)-1];
+  const finished=done>=14;
+  document.getElementById('ccTitle').textContent = finished?'N5 課表已走完一輪':`Day ${cur}　${c.t}`;
+  document.getElementById('ccPill').textContent = done+' / 14 天';
+  document.getElementById('ccDesc').textContent = finished
+    ? '接下來不用排新進度，每天按「開始練習」讓間隔複習把錯題回收乾淨就好。'
+    : c.why;
+}
+function setPhase(p){S.course.phase=p;save();document.getElementById('dayDetail').classList.add('hide');renderCourse()}
+function renderCourse(){
+  const ph=S.course.phase||'n5';
+  document.getElementById('ph-n5').className=ph==='n5'?'p':'g';
+  document.getElementById('ph-n4').className=ph==='n4'?'p':'g';
+  if(ph==='n4'){
+    const done=Object.keys(S.course.done2||{}).length;
+    document.getElementById('courseProg').textContent=done+' / 14 週完成';
+    document.getElementById('courseBar').firstElementChild.style.width=(done/14*100)+'%';
+    document.getElementById('dayList').innerHTML=COURSE2.map(c=>{
+      const isDone=!!(S.course.done2||{})[c.w], isNow=(S.course.cur2||1)===c.w;
+      return `<div class="day ${isDone?'done':''} ${isNow&&!isDone?'now':''}" onclick="openWeek(${c.w})">
+        <div class="dn">${isDone?'✓':'W'+c.w}</div>
+        <div style="flex:1"><div class="dt">${esc(c.t)}</div>
+        <div class="dd">時雨 ${c.sigure.length} 課　·　文法 ${c.gram.length} 條　·　N4 單字累計 ${c.vEnd}</div></div>
+        <div style="color:var(--tx3)">›</div></div>`;
+    }).join('');
+    return;
+  }
+  const done=Object.keys(S.course.done||{}).length;
+  document.getElementById('courseProg').textContent=done+' / 14 天完成';
+  document.getElementById('courseBar').firstElementChild.style.width=(done/14*100)+'%';
+  document.getElementById('dayList').innerHTML=COURSE.map(c=>{
+    const isDone=!!(S.course.done||{})[c.d], isNow=(S.course.cur||1)===c.d;
+    return `<div class="day ${isDone?'done':''} ${isNow&&!isDone?'now':''}" onclick="openDay(${c.d})">
+      <div class="dn">${isDone?'✓':'D'+c.d}</div>
+      <div style="flex:1">
+        <div class="dt">${esc(c.t)}</div>
+        <div class="dd">時雨 ${c.sigure.length} 課　·　文法 ${c.gram.length} 條　·　單字累計 ${c.vEnd}</div>
+      </div>
+      <div style="color:var(--tx3)">›</div></div>`;
+  }).join('');
+}
+function openWeek(w){
+  const c=COURSE2[w-1], box=document.getElementById('dayDetail');
+  const gr=c.gram.map(g=>GRAM.find(x=>x.p===g)).filter(Boolean);
+  box.classList.remove('hide');
+  box.innerHTML=`
+    <h2>Week ${c.w}　${esc(c.t)}<button class="sm g" onclick="document.getElementById('dayDetail').classList.add('hide')">收起</button></h2>
+    <div class="muted" style="margin-bottom:12px">${esc(c.why)}</div>
+    <h3>① 這週要讀的時雨課次</h3>
+    ${c.sigure.map(([n,t])=>`<a class="sg" href="${SIGURE_N4}${n}" target="_blank" rel="noopener">
+      <b>時雨 N4文法${n}</b>　${esc(t)}</a>`).join('')}
+    <h3>② 這週要會的句型（${gr.length} 條）</h3>
+    ${gr.map(g=>`<div class="li" style="display:block">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <b class="jp" style="font-size:16px">${esc(g.p)}</b><span class="pill">${esc(g.c)}</span></div>
+        <div class="ls">${esc(g.m)}</div>
+        <div class="jp" style="margin-top:5px;font-size:15px" onclick="speak('${esc(g.ek)}')">${esc(g.e)}</div>
+        <div class="ls">${esc(g.et)}</div></div>`).join('')}
+    <h3>③ 這週的練習範圍</h3>
+    <div class="kv"><span>單字池</span><span>全部 N5 ＋ 前 ${c.vEnd} 個 N4</span></div>
+    <div class="kv"><span>動詞池</span><span>全部 N5 ＋ 前 ${c.kEnd} 個 N4</span></div>
+    <div class="kv"><span>句子</span><span>全部 N5 ＋ ${esc(weekTags(c.w).join('、'))}</span></div>
+    <div class="row"><button class="p" onclick="startWeek(${c.w})">▶ 開始 Week ${c.w} 的練習</button></div>
+    <div class="tiny" style="margin-top:8px">週一～週五各跑一次（每次約 40 題），週六做一回計時綜合，週日清錯題本。</div>`;
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function startWeek(w){
+  WEEKF=COURSE2[w-1]; DAYF=null;
+  const plan={vocab:12,kanji:8,verb:10,part:6,build:5,listen:5,shadow:4};
+  const q=[];
+  MODES.forEach(m=>pick(m.k,plan[m.k]).forEach(it=>q.push({mode:m.k,it})));
+  if(!q.length){WEEKF=null;return toast('這一週還沒有題目')}
+  S.course.cur2=w; save();
+  go('prac'); runQueue(shuf(q));
+}
+function openDay(d){
+  const c=COURSE[d-1], box=document.getElementById('dayDetail');
+  const gr=c.gram.map(g=>GRAM.find(x=>x.p===g)).filter(Boolean);
+  box.classList.remove('hide');
+  box.innerHTML=`
+    <h2>Day ${c.d}　${esc(c.t)}<button class="sm g" onclick="document.getElementById('dayDetail').classList.add('hide')">收起</button></h2>
+    <div class="muted" style="margin-bottom:12px">${esc(c.why)}</div>
+
+    <h3>① 先讀（約 30 分鐘）</h3>
+    ${c.sigure.map(([n,t])=>`<a class="sg" href="${SIGURE_BASE}${n}" target="_blank" rel="noopener">
+      <b>時雨 N5文法${n}</b>　${esc(t)}</a>`).join('')}
+
+    ${gr.length?`<h3>② 今天要會的句型</h3>${gr.map(g=>`
+      <div class="li" style="display:block">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <b class="jp" style="font-size:16px">${esc(g.p)}</b><span class="pill">${esc(g.c)}</span></div>
+        <div class="ls">${esc(g.m)}</div>
+        <div class="jp" style="margin-top:5px;font-size:15px" onclick="speak('${esc(g.ek)}')">${esc(g.e)}</div>
+        <div class="ls">${esc(g.et)}</div>
+      </div>`).join('')}`:`<h3>② 今天沒有新句型</h3><div class="muted">今天專心練動詞分類，句型明天再加。</div>`}
+
+    <h3>③ 今天的練習範圍</h3>
+    <div class="kv"><span>新單字</span><span>${esc(c.newV)}</span></div>
+    <div class="kv"><span>單字練習池（含複習）</span><span>前 ${c.vEnd} 個 N5 單字</span></div>
+    <div class="kv"><span>動詞練習池</span><span>${c.kEnd?('前 '+c.kEnd+' 個 N5 動詞'):'今天不練變化'}</span></div>
+    <div class="kv"><span>句子情境</span><span>${esc(dayTags(c.d).join('、'))}</span></div>
+    <div class="row"><button class="p" onclick="startDay(${c.d})">▶ 開始 Day ${c.d} 的練習</button></div>
+    <div class="tiny" style="margin-top:8px">練習池是「累計」的，所以每天都會自動複習到前面幾天的內容。</div>`;
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function startDay(d){
+  DAYF=COURSE[d-1];
+  const plan={vocab:12,kanji:8,verb:10,part:6,build:5,listen:5,shadow:4};
+  const q=[];
+  MODES.forEach(m=>pick(m.k,plan[m.k]).forEach(it=>q.push({mode:m.k,it})));
+  if(!q.length){DAYF=null;return toast('這一天還沒有題目')}
+  S.course.cur=d; save();
+  go('prac'); runQueue(shuf(q));
+}
+
+/* ======================================================================
+   句子批改
+   ====================================================================== */
+let LASTCORR=null;
+/* digJSON 會優先回傳陣列（會把 items 挖出來），批改需要整個物件，所以另外做一個物件優先的 */
+function digObj(t){
+  if(!t)return null;
+  const cands=[t].concat(t.replace(/```json/gi,'```').split('```').filter(x=>x.trim()));
+  for(const c of cands){
+    const a=c.indexOf('{'), b=c.lastIndexOf('}');
+    if(a>-1&&b>a){ try{ return JSON.parse(c.slice(a,b+1)) }catch(e){} }
+  }
+  return null;
+}
+function renderCorrect(){
+  const card=document.getElementById('correctCard'); if(!card)return;
+  card.classList.toggle('hide',!hasAI());
+  const u=curUnit(), g=(u.obj.gram||[]).map(x=>GRAM.find(y=>y.p===x)).filter(Boolean);
+  document.getElementById('corrHint').textContent=u.label;
+  document.getElementById('corrGram').innerHTML = g.length
+    ? '今天的句型：'+g.map(x=>`<b class="jp" style="color:var(--tx)">${esc(x.p)}</b>`).join('　')
+    : '今天沒有新句型，寫什麼都可以。';
+}
+async function aiCorrect(){
+  const ta=document.getElementById('corrIn');
+  const raw=(ta.value||'').trim();
+  if(!raw)return toast('先寫幾句再按批改');
+  const lines_=raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(lines_.length>12)return toast('一次最多 12 句');
+  const btn=document.getElementById('corrBtn'); btn.disabled=true; btn.textContent='批改中…';
+  const out=document.getElementById('corrOut');
+  out.innerHTML='<div class="tiny" style="margin-top:10px">AI 正在逐句檢查…</div>';
+  const u=curUnit();
+  const gm=(u.obj.gram||[]).join('、')||'（不限）';
+  const sys='你是教台灣人日文的老師，學生程度 N5～N4，母語是繁體中文。所有解說一律用繁體中文，不要用簡體字。';
+  const prompt=`學生今天學的句型是：${gm}
+以下是他寫的句子，一行一句。請逐句批改。
+
+${lines_.map((l,i)=>(i+1)+'. '+l).join('\n')}
+
+只回傳 JSON，不要任何其他文字，格式如下：
+{"overall":"兩句話總評，指出他最需要注意的一件事",
+ "items":[{"orig":"學生原句",
+   "verdict":"ok 或 minor 或 wrong",
+   "fixed":"正確的日文句子，詞塊之間用 / 分開，助詞要獨立成一塊，例如：私 / は / 学生 / です。",
+   "kana":"fixed 的全部平假名讀音，不含 / ",
+   "zh":"這句的繁體中文意思",
+   "why":"錯在哪、為什麼，用繁體中文說明；完全正確就寫「這句沒問題」",
+   "natural":"母語者更常用的說法，沒有就留空字串"}]}
+
+verdict 判準：ok=完全正確；minor=看得懂但不自然或有小瑕疵；wrong=文法錯誤。
+items 的順序要跟學生的句子一致，數量也要一樣。`;
+  try{
+    const t=await askAI(prompt,sys,2600);
+    let j=digObj(t);
+    if(!j||!Array.isArray(j.items)){
+      const arr=digJSON(t);                       // 退而求其次：只拿到 items 陣列也能用
+      if(Array.isArray(arr))j={overall:'',items:arr};
+    }
+    if(!j||!Array.isArray(j.items)||!j.items.length)throw new Error('回覆格式不對，再按一次試試');
+    LASTCORR=j;
+    const badge={ok:['✓ 沒問題','var(--ok)'],minor:['△ 可以更好','var(--warn)'],wrong:['✗ 有錯','var(--acc)']};
+    out.innerHTML=`<div class="res" style="margin-top:12px"><div class="rt">總評</div>
+        <div class="rc" style="color:var(--tx)">${esc(j.overall||'')}</div></div>`
+      + j.items.map((it,i)=>{
+        const v=badge[it.verdict]||badge.minor;
+        return `<div class="cx ${esc(it.verdict||'minor')}">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+            <span class="tiny">第 ${i+1} 句</span><span class="pill" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span></div>
+          <div class="co jp ${it.verdict==='ok'?'keep':''}">${esc(it.orig||'')}</div>
+          ${it.verdict!=='ok'?`<div class="cf jp">${esc((it.fixed||'').replace(/ ?\/ ?/g,''))}</div>`:''}
+          ${it.kana?`<div class="ck jp">${esc(it.kana)}</div>`:''}
+          ${it.zh?`<div class="tiny">${esc(it.zh)}</div>`:''}
+          <div class="cw">${esc(it.why||'')}</div>
+          ${it.natural?`<div class="cn">更自然：<span class="jp">${esc(it.natural)}</span></div>`:''}
+          <div class="row"><button class="sm g" onclick="speak('${esc(it.kana||'')}')">🔊 唸一次</button></div>
+        </div>`;
+      }).join('')
+      + `<div class="row"><button class="p" onclick="saveCorrected()">📥 把正確版本存進題庫</button></div>
+         <div class="tiny" style="margin-top:7px">存進去之後，你自己寫錯的句子會變成組句／助詞／聽力／跟讀的題目，之後被反覆考。這是整個 App 最有效的一招。</div>`;
+    S.reports.unshift({t:Date.now(),title:'句子批改（'+u.label+'）',
+      body:(j.overall||'')+'\n\n'+j.items.map((x,i)=>`${i+1}. ${x.orig}\n   → ${(x.fixed||'').replace(/ ?\/ ?/g,'')}\n   ${x.why}`).join('\n\n')});
+    S.reports=S.reports.slice(0,20); save(); renderReports();
+  }catch(e){
+    out.innerHTML='<div class="tiny" style="color:var(--acc);margin-top:10px">失敗：'+esc(e.message)+'</div>';
+  }
+  btn.disabled=false; btn.textContent='批改';
+}
+function saveCorrected(){
+  if(!LASTCORR)return;
+  let n=0;
+  LASTCORR.items.forEach(it=>{
+    if(!it.fixed||!it.kana||!it.zh)return;
+    const j=it.fixed.includes('/')?it.fixed:it.fixed.split('').join(' / ');
+    if(S.custom.sent.some(x=>x.k===it.kana))return;
+    S.custom.sent.push({j, k:it.kana, c:it.zh, lv:5}); n++;
+  });
+  save(); renderAll();
+  toast(n?('存了 '+n+' 句進題庫'):'這些句子題庫裡已經有了');
+}
+
+/* ======================================================================
+   AI 導師
+   ====================================================================== */
+let chat=[],chatMode='';
+function aiPaint(){
+  document.getElementById('aiChat').innerHTML=chat.map(m=>
+    `<div class="msg ${m.role==='user'?'me':'ai'}"><div class="bub jp">${esc(m.text)}</div></div>`).join('');
+  const c=document.getElementById('aiChat');c.scrollTop=c.scrollHeight;
+}
+function aiOpen(title,mode){
+  chat=[];chatMode=mode;
+  document.getElementById('aiChatTitle').textContent=title;
+  document.getElementById('aiChatCard').classList.remove('hide');
+  document.getElementById('aiOut').classList.add('hide');
+  aiPaint();
+}
+function aiEnd(){document.getElementById('aiChatCard').classList.add('hide');chat=[]}
+const SCENES=['在餐廳點餐','在便利商店結帳','向路人問路','在飯店 check in','在藥局買藥','跟同事約時間開會','在車站問轉乘','第一次跟日本朋友自我介紹'];
+function aiScene(){
+  const s=prompt('選一個情境（或自己打）：\n'+SCENES.map((x,i)=>(i+1)+'. '+x).join('\n'));
+  if(!s)return;
+  const scene=/^\d+$/.test(s)?(SCENES[+s-1]||SCENES[0]):s;
+  aiOpen('🎭 '+scene,'scene');
+  chat.push({role:'model',text:'（情境開始）請用日文跟我對話。我會扮演對方，每一輪也會糾正你上一句。'});
+  aiPaint();
+}
+function aiFree(){aiOpen('💬 自由聊天','free');
+  chat.push({role:'model',text:'想聊什麼都可以，中文日文混著用也行。聊完按「產生檢討報告」我會整理你的問題。'});aiPaint()}
+function aiAsk(){aiOpen('❓ 文法問答','ask');
+  chat.push({role:'model',text:'問吧。例如「は 和 が 到底差在哪」「て形什麼時候用」。'});aiPaint()}
+function sysFor(m){
+  const base='你是教台灣人學日文的老師。學生程度大約 N5～N4，母語是繁體中文，懂漢字但不懂日文讀音、助詞和動詞變化。解說一律用繁體中文。';
+  if(m==='scene')return base+'現在進行情境角色扮演：你扮演對方，用簡單的日文（N5～N4）回話，句子後面附上假名和中譯。每一輪先用一兩句話糾正學生上一句日文的錯誤（若沒錯就說「這句沒問題」），再繼續對話。回覆控制在 150 字內。';
+  if(m==='ask')return base+'學生會問文法問題。回答要具體、給例句、指出台灣人常犯的錯。控制在 250 字內，不要用 markdown 標題。';
+  return base+'跟學生自由聊天，鼓勵他多用日文。不要在聊天中打斷糾正，等他要求檢討時再說。回覆控制在 150 字內。';
+}
+async function aiSend(){
+  const el=document.getElementById('aiInput');
+  const t=(el.value||'').trim(); if(!t)return;
+  el.value='';chat.push({role:'user',text:t});aiPaint();
+  chat.push({role:'model',text:'…'});aiPaint();
+  try{
+    const hist=chat.slice(0,-1).map(m=>(m.role==='user'?'學生：':'老師：')+m.text).join('\n');
+    const r=await askAI(hist+'\n老師：',sysFor(chatMode),900);
+    chat[chat.length-1]={role:'model',text:r};
+  }catch(e){chat[chat.length-1]={role:'model',text:'（失敗：'+e.message+'）'}}
+  aiPaint();
+}
+async function aiReport(){
+  if(!hasAI())return toast('要先設定 AI 金鑰');
+  if(chat.length<3)return toast('先聊幾句再產生報告');
+  toast('產生中…');
+  const hist=chat.map(m=>(m.role==='user'?'學生：':'老師：')+m.text).join('\n');
+  try{
+    const r=await askAI(`以下是學生的日文對話紀錄。請用繁體中文寫一份檢討報告，包含：
+1. 兩句話總評 ＋ JLPT 程度估計
+2. 文法錯誤清單：他說了什麼 → 該怎麼說 → 錯在哪
+3. 反覆出現的壞習慣
+4. 建議接下來練的 5 個句子（附中譯）
+不要用 markdown 標題符號。
+
+${hist}`,'',2000);
+    S.reports.unshift({t:Date.now(),title:chatMode==='scene'?'情境對話':'自由聊天',body:r});
+    S.reports=S.reports.slice(0,20);save();renderReports();
+    const o=document.getElementById('aiOut');
+    o.classList.remove('hide');
+    o.innerHTML=`<h2>📋 檢討報告</h2><div class="rc" style="white-space:pre-wrap;color:var(--tx);font-size:14px">${esc(r)}</div>`;
+    o.scrollIntoView({behavior:'smooth'});
+  }catch(e){toast('失敗：'+e.message)}
+}
+
+/* ======================================================================
+   啟動
+   ====================================================================== */
+(async function init(){
+  await load();
+  loadVoices(); setTimeout(loadVoices,600);
+  bumpStreak(); save();
+  renderAll();
+  if(S.supa.on)syncNow(true);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){ save(); syncNow(true); }
+    else { renderAll(); if(S.supa.on&&Date.now()-(S._pull||0)>18e4){S._pull=Date.now();syncNow(true)} }
+  });
+  window.addEventListener('pagehide',()=>{save();});
+})();
+
+</script>
+</body>
+</html>
