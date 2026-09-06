@@ -182,7 +182,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
   <div class="hr">
     <div>
       <h1 id="hTitle">コトバ Kotoba</h1>
-      <div class="hsub" id="hSub">日文 N5 → N1 每日訓練</div>
+      <div class="hsub" id="hSub">每天：讀句子 · 練單字 · 重組句子</div>
     </div>
     <div style="text-align:right">
       <div class="pill acc" id="hStreak">連續 0 天</div>
@@ -195,31 +195,20 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
 
 <!-- ================= 練習 ================= -->
 <section id="s-prac" class="on">
+  <div class="card hide" id="examCard" style="border-color:rgba(74,158,255,.35)">
+    <h2>🎯 N4 考試 <span class="pill b" id="examLeft"></span></h2>
+    <div class="tiny" id="examNote"></div>
+  </div>
+
   <div class="card" id="homeCard">
-    <h2>今天的目標 <span class="pill" id="goalAll"></span></h2>
+    <h2>今天的進度 <span class="pill" id="goalAll"></span></h2>
     <div class="goals" id="goalGrid"></div>
-    <div class="row"><button class="p" id="startBtn" onclick="startAuto()">▶ 開始練習</button></div>
-    <div class="tiny" style="margin-top:9px">「開始練習」會混合七種模式，範圍跟著課表走。點上面任一格可以只練那一項（不限範圍）。目標數字可在「我的 → 每日目標」調整。</div>
-  </div>
-
-  <div class="card" id="courseCard" onclick="go('course');openDay(S.course.cur||1)" style="cursor:pointer;border-color:rgba(74,158,255,.35)">
-    <h2>🗓️ <span id="ccTitle">14 天 N5 課表</span> <span class="pill b" id="ccPill"></span></h2>
-    <div class="muted" id="ccDesc"></div>
-  </div>
-
-  <div class="card" id="kanaCard">
-    <h2>⚡ 50 音速度測驗 <span class="pill" id="kanaBest"></span></h2>
-    <div class="muted">「會」跟「看到不用想」差很多。假名反應慢 0.5 秒，聽力就跟不上。40 題計時，測完會告訴你哪幾個字拖累你。</div>
-    <div class="row">
-      <button class="sm g" onclick="kanaSet('h')" id="kb-h">平假名</button>
-      <button class="sm g" onclick="kanaSet('k')" id="kb-k">片假名</button>
-      <button class="sm g" onclick="kanaSet('m')" id="kb-m">混合</button>
+    <div class="row"><button class="p" id="startBtn" onclick="startAuto()">▶ 開始今天的練習</button></div>
+    <div class="row" style="margin-top:6px">
+      <button class="sm g" id="lv-5" onclick="setLv(5)">只練 N5</button>
+      <button class="sm g" id="lv-0" onclick="setLv(0)">N5 ＋ N4</button>
     </div>
-    <div class="row">
-      <button class="sm g" onclick="kanaScope('basic')" id="ks-basic">只考清音</button>
-      <button class="sm g" onclick="kanaScope('all')" id="ks-all">全部（含濁音拗音）</button>
-    </div>
-    <div class="row"><button class="p" onclick="kanaStart()">開始測驗</button></div>
+    <div class="tiny" style="margin-top:9px">順序是：讀句子 → 練單字 → 默寫（挖空打字）→ 重組句子。點上面任一格可以只練那一項。份量在「我的 → 每日目標」調整。</div>
   </div>
 
   <div class="card hide" id="wrongCard" style="border-color:rgba(224,90,90,.4)">
@@ -238,17 +227,12 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
   </div>
 
   <div class="card" id="extraCard">
-    <h2>🔥 Extra 加練 <span class="pill" id="extraPill"></span></h2>
-    <div class="muted">今天比較有空？從這裡多吃一點。前兩個不會打亂課表進度。</div>
+    <h2>🔥 想多練一點</h2>
+    <div class="muted">今天比較有空就從這裡多做幾題，不影響今天的進度。</div>
     <div class="row">
-      <button onclick="startExtra(20)">加練 20 題<br><span class="tiny">同一天的範圍</span></button>
+      <button onclick="startExtra(20)">加練 20 題</button>
       <button onclick="startWeak(15)">弱點特訓 15 題<br><span class="tiny">專挑你常錯的</span></button>
     </div>
-    <div class="row">
-      <button onclick="unlockNext()" id="btnNext">提前上下一單元</button>
-      <button class="g" onclick="startAll(30)">全範圍挑戰 30 題</button>
-    </div>
-    <div class="tiny" id="extraNote" style="margin-top:8px"></div>
   </div>
 
   <div id="pracArea" class="hide">
@@ -259,21 +243,6 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
     </div>
     <div id="qBox"></div>
   </div>
-</section>
-
-<!-- ================= 課程 ================= -->
-<section id="s-course">
-  <div class="card">
-    <h2>🗓️ 14 天 N5 課表 <span class="pill" id="courseProg"></span></h2>
-    <div class="muted">文法講解看<a href="https://www.sigure.tw" target="_blank">時雨の町</a>，練習在這裡做。一天約 90 分鐘：讀 30 分、練 60 分。</div>
-    <div class="bar2" id="courseBar"><i></i></div>
-    <div class="row">
-      <button id="ph-n5" onclick="setPhase('n5')">① N5　14 天</button>
-      <button id="ph-n4" onclick="setPhase('n4')">② N4　14 週</button>
-    </div>
-  </div>
-  <div id="dayList"></div>
-  <div class="card hide" id="dayDetail"></div>
 </section>
 
 <!-- ================= 題庫 ================= -->
@@ -359,9 +328,11 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
   </div>
 
   <details id="goalPanel">
-    <summary>🎯 每日目標</summary>
-    <div id="goalSet"></div>
-    <div class="tiny" style="margin-top:9px">設 0 就是不列入當天目標。全部加起來建議 30～50 題，配合每天 25 分鐘的單字時段。</div>
+    <summary>🎯 每日目標 ／ 考試日期</summary>
+    <label>N4 考試日期（設空的就不顯示倒數）</label>
+    <input type="date" id="examDate" onchange="S.exam=this.value||'';save();renderExam()">
+    <div id="goalSet" style="margin-top:6px"></div>
+    <div class="tiny" style="margin-top:9px">設 0 就是當天不做那一項。四項加起來大約 35～45，配合每天 25～30 分鐘。</div>
   </details>
 
   <details>
@@ -462,7 +433,6 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
 
 <nav>
   <button class="on" data-s="prac"><span class="i">🎯</span>練習</button>
-  <button data-s="course"><span class="i">🗓️</span>課程</button>
   <button data-s="bank"><span class="i">📚</span>題庫</button>
   <button data-s="ai"><span class="i">🤖</span>AI</button>
   <button data-s="me"><span class="i">👤</span>我的</button>
@@ -481,12 +451,12 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px so
 /* ======================================================================
    コトバ Kotoba — 核心：題庫解析／儲存／間隔複習／同步／AI
    ====================================================================== */
-const APPVER='kotoba-v10';
+const APPVER='kotoba-v15';
 const KEY='kotoba_data_v1';
 const IDB_DB='kotoba', IDB_ST='kv';
 
 /* ---------- 題庫解析 ---------- */
-function lines(s){return (s||'').trim().split('\n').filter(x=>x.trim())}
+function lines(s){return (s||'').trim().split('\n').map(x=>x.trim()).filter(x=>x&&x[0]!=='#')}
 const VOCAB = lines(window.VOCAB_RAW).map((l,i)=>{
   const[w,r,m,p,lv]=l.split('|'); return {id:'v'+i,w,r,m,p,lv:+lv};
 });
@@ -510,7 +480,9 @@ const PARTICLES=['は','が','を','に','で','へ','と','も','から','ま�
 /* ---------- 預設狀態 ---------- */
 function fresh(){return{
   v:1, srs:{}, wrong:{}, log:{}, streak:0, lastDay:'', total:0,
-  goals:{vocab:10,kanji:8,verb:8,part:6,build:5,listen:5,shadow:5},
+  goals:{read:12,vocab:18,type:8,build:6},
+  lv:5,                       // 練習範圍：5＝只練 N5，0＝N5 ＋ N4
+  exam:'2026-12-06',          // N4 考試日期（可在「我的」改）
   rate:1, voice:'', prov:'gemini', keys:{}, models:{},
   supa:{url:'',key:'',code:'',on:false},
   custom:{vocab:[],sent:[]}, reports:[], lastBackup:0, updated:0,
@@ -572,16 +544,18 @@ async function readClip(){try{return await navigator.clipboard.readText()}catch(
 const STEPS=[1,3,8,20,45,100];
 function srsKey(mode,id){return mode+':'+id}
 function srsGet(k){return S.srs[k]||{n:0,due:0,ok:0,ng:0}}
-function srsHit(mode,id,good){
+function srsHit(mode,id,good,noWrong){
   const k=srsKey(mode,id), r=srsGet(k);
   if(good){ r.n=Math.min(r.n+1,STEPS.length-1); r.ok++; }
   else { r.n=0; r.ng++; }
   r.due=Date.now()+STEPS[r.n]*864e5;
   r.last=Date.now();
   S.srs[k]=r;
-  // 錯題本
-  if(!good){ S.wrong[k]={mode,id,t:Date.now(),streak:0}; }
-  else if(S.wrong[k]){ S.wrong[k].streak=(S.wrong[k].streak||0)+1; if(S.wrong[k].streak>=2) delete S.wrong[k]; }
+  // 錯題本（讀句子模式傳 noWrong，不進錯題本）
+  if(!noWrong){
+    if(!good){ S.wrong[k]={mode,id,t:Date.now(),streak:0}; }
+    else if(S.wrong[k]){ S.wrong[k].streak=(S.wrong[k].streak||0)+1; if(S.wrong[k].streak>=2) delete S.wrong[k]; }
+  }
   S.total++;
   // 每日進度
   const d=today(); if(!S.log[d])S.log[d]={};
@@ -904,14 +878,13 @@ function checkUpdate(manual){
    ====================================================================== */
 const HAS_KANJI=/[一-鿿]/;
 const MODES=[
-  {k:'vocab', n:'單字',   i:'🃏', d:'中日互選，先把量堆起來'},
-  {k:'kanji', n:'漢字',   i:'㊙️', d:'看漢字選讀音，別再用中文猜'},
-  {k:'verb',  n:'動詞',   i:'⚡', d:'變化反射訓練，初期投報率最高'},
-  {k:'part',  n:'助詞',   i:'🔗', d:'は・が・を・に・で，失分重災區'},
-  {k:'build', n:'組句',   i:'🧩', d:'看中文把日文句子拼出來'},
-  {k:'listen',n:'聽力',   i:'🎧', d:'只給聲音，漢字幫不上忙的那一科'},
-  {k:'shadow',n:'跟讀',   i:'🗣️', d:'播一次跟一次，練到嘴巴跟得上'}
+  {k:'read',  n:'讀句子',   i:'📖', d:'看中文想一下，翻開對日文、跟著唸一次'},
+  {k:'vocab', n:'單字',     i:'🃏', d:'中日互選，把單字量先堆起來'},
+  {k:'type',  n:'默寫',     i:'⌨️', d:'句子挖一格，自己把正確的字打出來'},
+  {k:'build', n:'重組句子', i:'🧩', d:'看中文，把打散的日文排回正確順序'}
 ];
+/* 舊版還有 漢字／動詞／助詞／聽力／跟讀 五種模式和 14 天課表、50 音測驗，
+   已依需求收起，只留「讀句子・練單字・重組句子」三件事。相關程式碼保留但不再從畫面進入。 */
 const KANA = lines(window.KANA_RAW).map((l,i)=>{
   const[h,k,r,g]=l.split('|'); return {id:'n'+i,h,k,r,g};
 });
@@ -922,6 +895,8 @@ function allSent(){return SENT.concat((S.custom.sent||[]).map((x,i)=>{
   return {id:'cs'+i,j:ch.join(''),ch,k:x.k||'',c:x.c||'',tag:'自訂',lv:x.lv||5,step:x.step||1};
 }))}
 function poolRaw(mode){
+  if(mode==='read') return allSent().filter(s=>s.c&&s.k);
+  if(mode==='type') return allSent().filter(s=>s.c&&s.k&&s.ch.length>=3);
   if(mode==='vocab')return allVocab();
   if(mode==='kanji')return allVocab().filter(v=>HAS_KANJI.test(v.w)&&v.w!==v.r);
   if(mode==='verb') return VERBS;
@@ -939,29 +914,9 @@ function n5k(){return VERBS.filter(v=>v.lv===5)}
 function dayTags(d){const t=[];for(let i=0;i<d;i++)t.push(...COURSE[i].tags);return t}
 function poolFor(mode){
   let p=poolRaw(mode);
-  if(WEEKF){
-    if(mode==='vocab'||mode==='kanji'){
-      const ids=new Set([...n5v(),...n4v().slice(0,WEEKF.vEnd)].map(v=>v.id));
-      return p.filter(x=>ids.has(x.id));
-    }
-    if(mode==='verb'){
-      const ids=new Set([...n5k(),...n4k().slice(0,WEEKF.kEnd)].map(v=>v.id));
-      return p.filter(x=>ids.has(x.id));
-    }
-    const tg=new Set(weekTags(WEEKF.w));
-    return p.filter(x=>x.lv===5||tg.has(x.tag));   // N4 階段：全部 N5 ＋ 當週情境
-  }
-  if(!DAYF)return p;
-  if(mode==='vocab'||mode==='kanji'){
-    const ids=new Set(n5v().slice(0,DAYF.vEnd).map(v=>v.id));
-    return p.filter(x=>ids.has(x.id));
-  }
-  if(mode==='verb'){
-    const ids=new Set(n5k().slice(0,DAYF.kEnd).map(v=>v.id));
-    return p.filter(x=>ids.has(x.id));
-  }
-  // 用文法難度（step）篩，不是用情境。step 就是「這句最早能在第幾天出現」
-  return p.filter(x=>x.lv===5&&(x.step||1)<=DAYF.d);
+  // 只留「只練 N5」時的 N5 內容；設成「N5 ＋ N4」就全部給
+  if((S.lv===0?0:5)===5) p=p.filter(x=>x.lv===5);
+  return p;
 }
 function pick(mode,n){
   const pool=poolFor(mode); if(!pool.length)return [];
@@ -976,8 +931,82 @@ function pick(mode,n){
   return shuf(out);
 }
 
+/* ---------- 文法比對：找出句子裡實際用到的句型 ---------- */
+function gramCore(p){
+  return p.replace(/[〜～・（）()｜|]/g,'').replace(/^(名|動|イ形|ナ形)/,'').split('／')[0].trim();
+}
+const GRAM_MATCH = GRAM.map(g=>{
+  let core=gramCore(g.p);
+  // 句型是辭書形，句子裡常是活用形：把結尾的 う／る／い 去掉，用語幹去比對
+  const stem = /[うるいだ]$/.test(core) ? core.slice(0,-1) : core;
+  return {g, core, stem};
+}).filter(x=>x.stem.length>=3);                        // 太短的核心（助詞等）會亂命中
+function gramsIn(str){
+  if(!str) return [];
+  const seen=new Set(), out=[];
+  GRAM_MATCH.filter(x=>str.includes(x.core)||str.includes(x.stem)).map(x=>x.g)
+    .sort((a,b)=>(b.lv-a.lv))
+    .forEach(g=>{ if(!seen.has(g.p)){seen.add(g.p);out.push(g)} });
+  return out.slice(0,3);
+}
+function sentChip(it){
+  const gs=gramsIn((it.j||'')+' '+(it.k||''));
+  const parts=[];
+  if(it.tag && it.tag!=='自訂') parts.push(it.tag);
+  if(gs[0]) parts.push('句型 '+gs[0].p);
+  return parts.join('　·　');
+}
+/* 答錯（或看解說）時顯示：完整答案 ＋ 這題在練的句型 ＋ 例句 */
+function explainHTML(c){
+  const it=c.it||{};
+  let h=`<div class="ans jp">${esc(c.ansTxt||'')}</div>`;
+  if(c.ansRd) h+=`<div class="rd jp">${esc(c.ansRd)}</div>`;
+  if(c.ansCn) h+=`<div class="rc">${esc(c.ansCn)}</div>`;
+  if(['read','build','type','part','listen','shadow'].includes(c.mode)){
+    const gs=gramsIn((it.j||'')+' '+(it.k||''));
+    if(gs.length){
+      h+=`<div class="tiny" style="color:var(--tx2);margin-top:10px">這題在練的句型</div>`;
+      gs.forEach(g=>{
+        h+=`<div class="cx" style="margin-top:6px">
+          <div><b class="jp">${esc(g.p)}</b> <span class="pill ${g.lv===5?'ok':'w'}">N${g.lv}</span></div>
+          <div class="ls">${esc(g.m)}　｜　接續：${esc(g.c)}</div>
+          <div class="jp" style="margin-top:4px" onclick="speak('${esc(g.ek)}')">${esc(g.e)}</div>
+          <div class="ls jp" style="color:var(--acc2)">${esc(g.ek)}</div>
+          <div class="ls">${esc(g.et)}</div></div>`;
+      });
+    } else {
+      h+=`<div class="tiny" style="margin-top:9px">照中文語順排，特別注意助詞（は／が／を／に／で）和動詞變化。</div>`;
+    }
+  }
+  if(c.mode==='vocab'){
+    h+=`<div class="ls" style="margin-top:8px">${esc(it.w||'')}（${esc(it.r||'')}）・${esc(it.p||'')}・N${it.lv}</div>`;
+    const ex=allSent().find(s=>s.j&&it.w&&s.j.includes(it.w));
+    if(ex) h+=`<div class="cx" style="margin-top:6px"><div class="jp" onclick="speak('${esc(ex.k)}')">${esc(ex.j)}</div>
+      <div class="ls jp" style="color:var(--acc2)">${esc(ex.k)}</div><div class="ls">${esc(ex.c)}</div></div>`;
+  }
+  return h;
+}
+
 /* ---------- 出題 ---------- */
 function mkQ(mode,it){
+  if(mode==='read') return {mode,it,read:true,chip:sentChip(it),lab:'看中文，先想想日文怎麼說',
+    main:it.c, say:it.k, ansTxt:it.j, ansRd:it.k, ansCn:it.c};
+  if(mode==='type'){
+    const clean=s=>s.replace(/[。、，,！!？?「」『』・…\s]/g,'');
+    let cand=it.ch.map((c,i)=>({c,i})).filter(x=>{
+      const t=clean(x.c);
+      return t && !/^(です|ます|でした|ました|ません|だ|た|て)$/.test(t);
+    });
+    const short=cand.filter(x=>clean(x.c).length<=5);
+    if(short.length)cand=short;
+    const p=cand.length?rnd(cand):{c:it.ch[0],i:0};
+    const ans=clean(p.c);
+    const shown=it.ch.map((c,i)=> i===p.i ? c.replace(ans,'［　？　］') : c).join('');
+    return {mode,it,typeBlank:true,blankAns:ans,chip:sentChip(it),
+      lab:'把空格的字打出來（有漢字就要打漢字）',
+      main:shown,mainSm:true,sub:it.c,
+      say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
+  }
   if(mode==='vocab'){
     const pool=allVocab();
     // 中文欄和日文寫法互相包含的字（山→山、電話→電話…）問意思等於送分，改問讀音
@@ -1032,7 +1061,7 @@ function mkQ(mode,it){
       opts:shuf([right,...wrong]).map(o=>({t:o,s:'',ok:o===right})),
       say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
   }
-  if(mode==='build') return {mode,it,build:true,lab:'把日文句子拼出來',main:it.c,mainSm:true,
+  if(mode==='build') return {mode,it,build:true,chip:sentChip(it),lab:'把日文句子拼出來',main:it.c,mainSm:true,
       say:it.k,ansTxt:it.j,ansRd:it.k,ansCn:it.c};
   if(mode==='shadow') return {mode,it,shadow:true,lab:'聽一次，跟著唸一次',
       main:it.j, say:it.k, ansTxt:it.j, ansRd:it.k, ansCn:it.c};
@@ -1047,25 +1076,20 @@ function mkQ(mode,it){
 
 /* ---------- 練習流程 ---------- */
 let Q=[],qi=0,answered=false,cur=null,slot=[];
-function courseDone(){
-  return (S.course.phase||'n5')==='n4'
-    ? Object.keys(S.course.done2||{}).length>=14
-    : Object.keys(S.course.done||{}).length>=14 && (S.course.phase||'n5')==='n5' && false;
+/* 依 MODES 的順序分組：先讀句子 → 再單字 → 最後重組句子，每組內部才打散 */
+function orderQueue(q){
+  const out=[];
+  MODES.forEach(m=>out.push(...shuf(q.filter(x=>x.mode===m.k))));
+  return out;
 }
 function startAuto(){
   const q=[];
-  const u=curUnit();
-  const useCourse = (S.course.phase||'n5')==='n4'
-    ? Object.keys(S.course.done2||{}).length<14
-    : Object.keys(S.course.done||{}).length<14;
-  if(useCourse)setScope(u);
   MODES.forEach(m=>{
     const need=Math.max(0,(S.goals[m.k]||0)-doneToday(m.k));
-    if(need>0)pick(m.k,Math.min(need,12)).forEach(it=>q.push({mode:m.k,it}));
+    if(need>0)pick(m.k,Math.min(need,20)).forEach(it=>q.push({mode:m.k,it}));
   });
-  if(!q.length){ MODES.forEach(m=>pick(m.k,2).forEach(it=>q.push({mode:m.k,it}))); toast('今天目標都完成了，這是加練'); }
-  DAYF=null; WEEKF=null;
-  runQueue(shuf(q).slice(0,40));
+  if(!q.length){ MODES.forEach(m=>pick(m.k,3).forEach(it=>q.push({mode:m.k,it}))); toast('今天目標都完成了，這是加練'); }
+  runQueue(orderQueue(q));
 }
 function startMode(m){
   if(m==='wrong'){
@@ -1074,30 +1098,24 @@ function startMode(m){
     if(!q.length)return toast('錯題本是空的');
     return runQueue(shuf(q).slice(0,25));
   }
-  const u=curUnit();
-  const fin=(S.course.phase||'n5')==='n4'
-    ? Object.keys(S.course.done2||{}).length>=14
-    : Object.keys(S.course.done||{}).length>=14;
-  if(!fin)setScope(u);                       // 單練一項也不要跳出當前進度的範圍
   const need=Math.max(1,(S.goals[m]||0)-doneToday(m));
   const q=pick(m,Math.max(need,10)).map(it=>({mode:m,it}));
-  DAYF=null; WEEKF=null;
-  if(!q.length)return toast(MODES.find(x=>x.k===m).n+'：目前的進度還沒有這種題目，先做別的');
+  if(!q.length)return toast((MODES.find(x=>x.k===m)||{n:m}).n+'：目前這個範圍沒有題目，換個範圍或先做別的');
   runQueue(q);
 }
 function runQueue(q){
   Q=q;qi=0;
-  ['homeCard','courseCard','kanaCard','wrongCard','dueCard','extraCard'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.add('hide')});
+  ['examCard','homeCard','wrongCard','dueCard','extraCard'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.add('hide')});
   document.getElementById('pracArea').classList.remove('hide');
   showQ(); window.scrollTo(0,0);
 }
 function showHome(){
-  ['homeCard','courseCard','kanaCard','extraCard'].forEach(i=>{
+  ['homeCard','extraCard'].forEach(i=>{
     const e=document.getElementById(i); if(e)e.classList.remove('hide');
   });
+  renderExam();
 }
 function quitPrac(){
-  DAYF=null; WEEKF=null;
   document.getElementById('pracArea').classList.add('hide');
   showHome();
   try{speechSynthesis.cancel()}catch(e){}
@@ -1114,12 +1132,10 @@ function showQ(){
       <div class="row"><button class="p" onclick="startAuto()">再來一輪</button>
       <button class="g" onclick="quitPrac()">回首頁</button></div>`;
     document.getElementById('pracInfo').textContent='';
-    if(DAYF){ S.course.done[DAYF.d]=true; if(DAYF.d<14)S.course.cur=DAYF.d+1; }
-    if(WEEKF){ S.course.done2=S.course.done2||{}; S.course.done2[WEEKF.w]=true; if(WEEKF.w<14)S.course.cur2=WEEKF.w+1; }
     save(); syncNow(true); return;
   }
   const {mode,it}=Q[qi];
-  cur=mkQ(mode,it); answered=false; slot=[];
+  cur=mkQ(mode,it); answered=false; slot=[]; hintN=0;
   const M=MODES.find(m=>m.k===mode);
   document.getElementById('pracInfo').textContent=`${M.i} ${M.n}　${qi+1} / ${Q.length}`;
   document.getElementById('btnPrev').disabled=qi===0;
@@ -1129,8 +1145,10 @@ function showQ(){
 
 function paint(){
   const c=cur, box=document.getElementById('qBox');
+  const chip = c.chip?`<div style="text-align:center;margin-bottom:8px"><span class="pill b">🏷 ${esc(c.chip)}</span></div>`:'';
   let h=`<div class="q">
     <div class="qlab">${esc(c.lab)}</div>
+    ${chip}
     <div class="qmain ${c.mainSm?'sm':''} jp">${esc(c.main)}</div>
     ${c.sub?`<div class="qsub jp">${esc(c.sub)}</div>`:''}
     ${c.hint?`<div class="qhint">${esc(c.hint)}</div>`:''}
@@ -1139,6 +1157,35 @@ function paint(){
   if(c.listen){
     h+=`<div class="row"><button onclick="speak(cur.say)">🔊 再聽一次</button>
       <button class="g" onclick="speakSlow()">🐢 放慢</button></div>`;
+  }
+  if(c.read){
+    box.innerHTML=`<div class="q">
+        <div class="qlab">${esc(c.lab)}</div>
+        ${chip}
+        <div class="qmain sm">${esc(c.it.c)}</div>
+        <div id="readRev" class="hide" style="margin-top:16px">
+          <div class="qmain jp">${esc(c.it.j)}</div>
+          <div class="qsub jp" style="color:var(--acc2)">${esc(c.it.k)}</div>
+          <div id="readGram" class="tiny" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="row" id="readCtl"><button class="p" onclick="revealRead()">翻開看日文 →</button></div>
+      <div id="resBox"></div>`;
+    return;
+  }
+  if(c.typeBlank){
+    h+=`<div style="margin-top:12px"><input id="typeIn" class="jp" placeholder="打日文…"
+        autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter')checkType()"></div>
+      <div class="row">
+        <button class="g" onclick="typeHint()" id="typeHintBtn">💡 提示</button>
+        <button class="p" onclick="checkType()">對答案</button>
+      </div>
+      <div class="tiny" id="typeHintOut" style="margin-top:6px"></div>
+      <div id="resBox"></div>`;
+    box.innerHTML=h;
+    setTimeout(()=>{const el=document.getElementById('typeIn');if(el)el.focus()},60);
+    return;
   }
   if(c.shadow){
     box.innerHTML=`<div class="q shad">
@@ -1164,8 +1211,10 @@ function paint(){
   if(c.build){
     h+=`<div class="slot" id="slot"></div>
         <div class="pool" id="pool"></div>
-        <div class="row"><button class="g" onclick="undoChip()">↩ 退一格</button>
-        <button class="p" onclick="checkBuild()">確認</button></div>`;
+        <div class="row"><button class="g" onclick="buildHint()">💡 提示</button>
+        <button class="g" onclick="undoChip()">↩ 退一格</button>
+        <button class="p" onclick="checkBuild()">確認</button></div>
+        <div class="tiny" id="buildHintOut" style="margin-top:6px"></div>`;
   }else{
     h+=`<div class="opts" id="opts">`+c.opts.map((o,i)=>
       `<div class="opt jp" data-i="${i}" onclick="answer(${i})">${esc(o.t)}${o.s?`<small class="jp">${esc(o.s)}</small>`:''}</div>`).join('')+`</div>`;
@@ -1175,6 +1224,68 @@ function paint(){
   if(c.build)paintBuild();
 }
 function speakSlow(){const r=S.rate;S.rate=Math.max(.5,r-.3);speak(cur.say);S.rate=r}
+
+/* 讀句子：翻卡 → 對答案 → 自評 */
+function gramSummary(it){
+  const gs=gramsIn((it.j||'')+' '+(it.k||''));
+  return gs.length ? '句型：'+gs.map(g=>`<b class="jp" style="color:var(--tx)">${esc(g.p)}</b>（${esc(g.m)}）`).join('、') : '';
+}
+function revealRead(){
+  const r=document.getElementById('readRev'); if(!r)return;
+  r.classList.remove('hide');
+  const g=document.getElementById('readGram'); if(g)g.innerHTML=gramSummary(cur.it);
+  speak(cur.say);
+  document.getElementById('readCtl').innerHTML=
+    `<button class="g" onclick="speak(cur.say)">🔊 再唸一次</button>
+     <button class="g" onclick="speakSlow()">🐢 放慢</button>
+     <button class="g" onclick="gradeRead(false)">還不熟</button>
+     <button class="p" onclick="gradeRead(true)">會了 →</button>`;
+}
+function buildHint(){
+  const out=document.getElementById('buildHintOut'); if(!out)return;
+  const s=gramSummary(cur.it);
+  out.innerHTML=(s?s+'<br>':'')+'讀音：<span class="jp" style="color:var(--acc2)">'+esc(cur.it.k)+'</span>';
+}
+/* 默寫（句子挖空）*/
+let hintN=0;
+function typeHint(){
+  const c=cur, out=document.getElementById('typeHintOut'); if(!out)return;
+  hintN++;
+  if(hintN===1){
+    const s=gramSummary(c.it);
+    out.innerHTML = s || ('整句讀音：<span class="jp" style="color:var(--acc2)">'+esc(c.it.k)+'</span>');
+  }else if(hintN===2){
+    out.innerHTML += '<br>空格：<span class="jp">'+esc(c.blankAns[0])+'…</span>（共 '+c.blankAns.length+' 個字）';
+  }else{
+    out.innerHTML += '<br>整句讀音：<span class="jp" style="color:var(--acc2)">'+esc(c.it.k)+'</span>';
+  }
+}
+function norm2(s){return (s||'').trim().replace(/[。、，,！!？?「」『』・…\s]/g,'')}
+function checkType(){
+  if(answered)return;
+  const el=document.getElementById('typeIn');
+  const typed=norm2(el&&el.value);
+  if(!typed)return toast('先打字再對答案');
+  if(el)el.disabled=true;
+  const ans=cur.blankAns;
+  const kanaOnly=/^[ぁ-んァ-ンー]+$/.test(typed);
+  let ok=false, near=false, diff='';
+  if(typed===ans){ ok=true; }
+  else if(kanaOnly && HAS_KANJI.test(ans) && cur.it.k && cur.it.k.includes(typed)){ near=true; }
+  if(!ok){
+    diff=`<div class="ans jp">你打的：${esc(typed||'（空白）')}</div>
+          <div class="rd jp" style="color:var(--ok)">正解：${esc(ans)}</div>`;
+  }
+  finish(ok,{near,diff});
+}
+function gradeRead(ok){
+  if(answered)return; answered=true;
+  srsHit(cur.mode,cur.it.id,ok,true);      // noWrong：讀句子不進錯題本
+  bump('mode',cur.mode,ok);
+  const M=MODES.find(m=>m.k===cur.mode);
+  if(doneToday(cur.mode)===(S.goals[cur.mode]||0)&&S.goals[cur.mode]>0)toast(M.i+' '+M.n+' 今天讀完了');
+  nextQ();
+}
 
 /* 組句 */
 function paintBuild(){
@@ -1214,21 +1325,26 @@ function bump(bucket,key,ok){
   const r=b[key]=b[key]||{ok:0,ng:0};
   ok?r.ok++:r.ng++;
 }
-function finish(ok){
+function finish(ok,extra){
   answered=true;
-  srsHit(cur.mode,cur.it.id,ok);
+  const near=!!(extra&&extra.near);
+  srsHit(cur.mode,cur.it.id, ok||near, near&&!ok);   // 接近＝算會、但不進錯題本
   bump('mode',cur.mode,ok);
   if(cur.mode==='verb')bump('form',cur.fk,ok);
   if(cur.mode==='part')bump('part',cur.pk,ok);
   save();
   const c=cur;
+  const head = ok ? '答對了' : near ? '讀音對了，但正式書寫要用漢字' : '答錯了，收進錯題本';
+  const col  = ok ? 'var(--ok)' : near ? 'var(--warn)' : 'var(--acc)';
+  const bcol = ok ? 'rgba(62,207,142,.45)' : near ? 'rgba(240,180,41,.45)' : 'rgba(224,90,90,.45)';
   const rb=document.getElementById('resBox');
-  rb.innerHTML=`<div class="res" style="border-color:${ok?'rgba(62,207,142,.45)':'rgba(224,90,90,.45)'}">
-      <div class="rt" style="color:${ok?'var(--ok)':'var(--acc)'}">${ok?'答對了':'答錯了，收進錯題本'}</div>
-      <div class="ans jp">${esc(c.ansTxt)}</div>
-      ${c.ansRd?`<div class="rd jp">${esc(c.ansRd)}</div>`:''}
-      ${c.ansCn?`<div class="rc">${esc(c.ansCn)}</div>`:''}
+  rb.innerHTML=`<div class="res" style="border-color:${bcol}">
+      <div class="rt" style="color:${col}">${head}</div>
+      ${extra&&extra.diff?extra.diff:''}
     </div>
+    ${ok
+      ? `<details style="margin-top:9px"><summary>看解說</summary><div class="res" style="margin-top:6px">${explainHTML(c)}</div></details>`
+      : `<div class="res" style="margin-top:9px"><div class="tiny" style="color:var(--tx2);margin-bottom:6px">怎麼解這題</div>${explainHTML(c)}</div>`}
     <div class="row">
       <button class="g" onclick="speak(cur.say)">🔊 唸一次</button>
       ${hasAI()?`<button class="g" onclick="aiExplain()">✨ AI 拆解</button>`:''}
@@ -1278,14 +1394,15 @@ function renderGoals(){
   }).join('');
   document.getElementById('goalAll').textContent=`${done} / ${tot} 項達標`;
   const sb=document.getElementById('startBtn');
-  if(sb){
-    const u=curUnit();
-    const fin=(S.course.phase||'n5')==='n4'
-      ? Object.keys(S.course.done2||{}).length>=14
-      : Object.keys(S.course.done||{}).length>=14;
-    sb.innerHTML=fin?'▶ 開始練習<br><span class="tiny">全題庫範圍</span>'
-      :`▶ 開始練習<br><span class="tiny">${u.label} 的範圍</span>`;
-  }
+  if(sb)sb.innerHTML='▶ 開始今天的練習<br><span class="tiny">讀句子 → 單字 → 默寫 → 重組句子</span>';
+  lvBtns();
+}
+function setLv(v){ S.lv=v; save(); lvBtns(); toast(v===5?'範圍：只練 N5':'範圍：N5 ＋ N4'); }
+function lvBtns(){
+  const a=document.getElementById('lv-5'), b=document.getElementById('lv-0');
+  const n5=(S.lv===0?0:5)===5;
+  if(a)a.className='sm '+(n5?'p':'g');
+  if(b)b.className='sm '+(n5?'g':'p');
 }
 function renderGoalSet(){
   document.getElementById('goalSet').innerHTML=MODES.map(m=>
@@ -1309,6 +1426,27 @@ function renderStats(){
   dc.classList.toggle('hide',du===0);
   document.getElementById('dueN').textContent=du+' 項';
 }
+function seenIds(prefix){
+  return new Set(Object.keys(S.srs).filter(k=>k.indexOf(prefix+':')===0).map(k=>k.slice(prefix.length+1)));
+}
+function renderExam(){
+  const card=document.getElementById('examCard'); if(!card)return;
+  if(!S.exam){ card.classList.add('hide'); return; }
+  const d=Math.ceil((new Date(S.exam+'T00:00:00')-new Date())/864e5);
+  card.classList.remove('hide');
+  document.getElementById('examLeft').textContent = d>1?('還有 '+d+' 天') : d===1?'剩最後一天' : d===0?'就是今天' : '已考完';
+  const totV=poolRaw('vocab').filter(x=>x.lv===4||x.lv===5).length;
+  const seenV=[...seenIds('vocab')].length;
+  const sentSeen=new Set([...seenIds('read'),...seenIds('type'),...seenIds('build')]).size;
+  let note=`單字碰過 <b>${seenV}</b> / ${totV}　·　句子練過 <b>${sentSeen}</b> 句`;
+  if(d>0){
+    const perDay=Math.max(8,Math.ceil((totV-seenV)/d));
+    note+=`<br>離考試 ${d} 天。要把題庫的單字練完，平均每天要碰 <b>${perDay}</b> 個。`;
+    if((S.lv===0?0:5)===5) note+=`<br>⚠️ 現在只練 N5，考 N4 記得把上面切成「N5 ＋ N4」。`;
+    note+=`<br>建議每天：文法自己讀 → App 按「開始今天的練習」一輪 → 有空再加練或複習錯題。`;
+  }
+  document.getElementById('examNote').innerHTML=note;
+}
 function renderReports(){
   const el=document.getElementById('reportList');
   if(!S.reports.length)return void(el.innerHTML='<div class="tiny">還沒有報告。用 AI 聊天後按「產生檢討報告」就會出現。</div>');
@@ -1317,7 +1455,7 @@ function renderReports(){
      <div class="rc" style="white-space:pre-wrap;font-size:13.5px;color:var(--tx)">${esc(r.body)}</div></details>`).join('');
 }
 function renderAll(){
-  renderGoals();renderStats();renderGoalSet();renderReports();renderBank();renderCourse();renderCourseCard();renderHeaderSub();kanaBtns();renderExtra();renderWeak();renderCorrect();
+  renderGoals();renderStats();renderGoalSet();renderReports();renderBank();renderHeaderSub();renderWeak();renderCorrect();renderExam();
   bkDot();syncDot();refreshAI();
   document.getElementById('verTxt').textContent=APPVER;
   document.getElementById('cntVocab').textContent=allVocab().length+' 字';
@@ -1327,6 +1465,7 @@ function renderAll(){
   document.getElementById('sqlText').textContent=SQL;
   document.getElementById('rate').value=S.rate;
   document.getElementById('rateV').textContent=(+S.rate).toFixed(1);
+  document.getElementById('examDate').value=S.exam||'';
   document.getElementById('prov').value=S.prov;
   document.getElementById('apikey').value=aiKey();
   document.getElementById('model').value=aiModel();
@@ -1338,7 +1477,7 @@ let BT='vocab';
 function bankTab(t){BT=t;renderBank();
   document.querySelectorAll('#bankTabs button').forEach(b=>b.classList.toggle('p',b.dataset.t===t))}
 function renderBank(){
-  const tabs=[['vocab','單字'],['verb','動詞'],['pair','自他'],['gram','文法'],['sent','句子'],['wrong','錯題']];
+  const tabs=[['vocab','單字'],['sent','句子'],['wrong','錯題']];
   const tb=document.getElementById('bankTabs');
   if(tb.children.length!==tabs.length)
     tb.innerHTML=tabs.map(([k,n])=>`<button data-t="${k}" class="${k===BT?'p':''}" onclick="bankTab('${k}')">${n}</button>`).join('');
@@ -1377,7 +1516,7 @@ function renderBank(){
       const it=poolFor(w.mode).find(x=>x.id===w.id); if(!it)return '';
       const label=it.w||it.d||it.j;
       return `<div class="li"><div class="lw jp">${esc(label)}</div>
-        <div class="lm">${esc(it.m||it.c||'')}<div class="ls">${MODES.find(m=>m.k===w.mode).n}</div></div>
+        <div class="lm">${esc(it.m||it.c||'')}<div class="ls">${(MODES.find(m=>m.k===w.mode)||{n:w.mode}).n}</div></div>
         <button class="sm g" onclick="delWrong('${k}')">移除</button></div>`;
     });
     if(!n)rows=['<div class="tiny">錯題本是空的。</div>'];
@@ -1657,9 +1796,7 @@ function examDays(){
   return d;
 }
 function renderHeaderSub(){
-  const d=examDays();
-  document.getElementById('hSub').textContent = d>0
-    ? `距 12/6 N4 考試 ${d} 天` : '日文 N5 → N1 每日訓練';
+  document.getElementById('hSub').textContent='每天：讀句子 · 練單字 · 重組句子';
 }
 function renderExtra(){
   const u=curUnit(), d=today();
